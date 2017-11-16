@@ -1,0 +1,112 @@
+GET _cat/indices
+
+GET /_nodes/thread_pool/
+
+GET /keti/_count
+GET /qlr/_count
+
+GET keti/_search
+
+GET qlr/_search
+
+GET ql/_search
+
+GET ketiindex/keti/_search
+
+GET ketiindex/qlr/_search
+
+DELETE qlr
+
+GET /metricbeat-2017.10.23/_count
+
+
+GET /pageindex/_settings
+
+PUT /pageindex/_settings
+{ "index" : { "max_result_window" : 10000}}
+
+ GET /keti/_search
+{
+       "query": {
+        "match" : {
+            "bdcdyh" : "330801191589GB71086F260524894"
+      }
+      }
+}
+ GET /qlr/_search
+{
+       "query": {
+        "match" : {
+            "bdcdyh" : "431381739195GB63614F118536438"
+      }
+      }
+}
+ GET /qlr/_search
+{
+       "query": {
+        "match" : {
+            "zjh" : "420117199206082091"
+      }
+      }
+}
+ GET /qlr/_search
+{
+       "query": {
+        "term" : {
+            "bdcdyh" : "71de7d0bc8d3484aaa519fcff9668884"
+      }
+      }
+}
+
+ GET /keti/_search
+{
+  "size":100,
+       "query": {
+        "match" : {
+            "qx" : "440823"
+        }
+    }
+}
+
+ GET /keti/_search
+{
+       "query": {
+        "match" : {
+            "zl" : "Õ¿½­"
+        }
+    }
+}
+ 
+
+ GET /keti/_search
+{
+       "query": {
+        "match" : {
+            "bdcdyh" : "620522865057GB22282F729085473",
+            "lx": "5"
+        }
+    }
+}
+
+ GET /keti/_search
+{
+       "query":{
+          "bool": {
+            "must": [
+                { "match": { "bdcdyh": "620522865057GB22282F729085473" }},
+                { "match": { "lx":  "5" }}
+            ]
+        }
+}
+}
+
+GET _cat/nodes?v
+GET /pageindex/_mapping/tweet
+
+GET /pageindex/tweet/_search
+{
+    "from" : 1, "size" : 3,
+    "query" : {
+        "term" : { "user" : "a" }
+    }
+}

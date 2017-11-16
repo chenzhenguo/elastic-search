@@ -1,0 +1,134 @@
+PUT keti1
+{
+  "mappings": {
+    "keti1": {
+      "properties": {
+        "bdcdyh": {
+          "type":  "keyword"
+        },
+        "lx": {
+          "type":  "keyword"
+        },
+        "uuid": {
+          "type":  "keyword"
+        },
+        "qx": {
+          "type":  "keyword"
+        },
+        "records": {
+          "type":  "keyword"
+        },
+        "postDate": {
+          "type":  "date"
+        },
+        "zl": {
+          "type":  "text",
+          "analyzer":"ik_max_word"
+        }
+      }
+    }
+  }
+}
+
+
+
+PUT keti2
+{
+  "mappings": {
+    "keti1": {
+      "properties": {
+        "bdcdyh": {
+          "type":  "keyword"
+        },
+        "lx": {
+          "type":  "keyword"
+        },
+        "uuid": {
+          "type":  "keyword"
+        },
+        "qx": {
+          "type":  "keyword"
+        },
+        "records": {
+          "type":  "keyword"
+        },
+        "postDate": {
+          "type":  "date"
+        },
+        "zl": {
+          "type":  "text",
+          "analyzer":"ik_max_word"
+        }
+      }
+    }
+  }
+}
+
+
+
+PUT qlr1
+{
+  "mappings": {
+    "qlr1": {
+      "properties": {
+        "bdcdyh": {
+          "type":  "keyword"
+        },
+        "zjh": {
+          "type":  "keyword"
+        },
+        "uuid": {
+          "type":  "keyword"
+        },
+        "lx": {
+          "type":  "keyword"
+        },
+        "xm": {
+          "type":  "text",
+          "analyzer":"ik_max_word"
+        },
+        "records": {
+          "type":  "keyword"
+        },
+        "postDate": {
+          "type":  "date"
+        },
+        "dw": {
+          "type":  "text",
+          "analyzer":"ik_max_word"
+        }
+      }
+    }
+  }
+}
+
+PUT ql1
+{
+  "mappings": {
+    "ql1": {
+      "properties": {
+        "bdcdyh": {
+          "type":  "keyword"
+        },
+        "qllx": {
+          "type":  "keyword"
+        },
+        "qlxz": {
+          "type":  "keyword"
+        },
+        "uuid": {
+          "type":  "keyword"
+        },
+         "qx": {
+          "type":  "keyword"
+        },
+        "records": {
+          "type":  "keyword"
+        },
+        "postDate": {
+          "type":  "date"
+        }
+      }
+    }
+  }
+}
