@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
@@ -37,7 +38,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  */
 public class ESUtils {
+	
+	public static void main(String[] args) throws UnknownHostException, IOException {
+		createIndex(getClient("es", "10.110.13.176"), "keti2","keti2",5,3);
+	}
+	public static void createIndex(TransportClient client, String indexName, String type, int shareds, int replices)
+			throws IOException {
+		XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject("settings")
+				.field("index.number_of_shards",shareds).field("number_of_replicas",replices).endObject().endObject();
 
+		CreateIndexRequestBuilder cirb = client.admin().indices().prepareCreate(indexName).setSource(mapping);
+		CreateIndexResponse response = cirb.execute().actionGet();
+
+		if (response.isShardsAcked()) {
+			System.out.println("index created");
+		} else {
+			System.out.println("index create failed");
+		}
+
+	}
 
 	public static TransportClient getClient(String clustername,String hostname) throws UnknownHostException {
 		Settings settings = Settings.builder().put("cluster.name", clustername).build();

@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Testpageketi {
-	public static Logger logger = LoggerFactory.getLogger(Testpageketi.class);
+public class Testpageketi2 {
+	public static Logger logger = LoggerFactory.getLogger(Testpageketi2.class);
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss:SSS");
 	public static SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -44,7 +44,7 @@ public class Testpageketi {
 	public static String clustername = "es";
 	public static String index = "keti2";
 	public static String type = "keti2";
-	public static int count = 10001;
+	public static int count = 2;
 	public static ObjectMapper mapper = new ObjectMapper();
 
 	public static void main(String[] args) {

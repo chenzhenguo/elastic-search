@@ -29,7 +29,7 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class KetiQuery_wj {
+public class KetiQuery_WJ {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static String hostname = "10.110.13.176";
 	// public static String hostname = "localhost";
@@ -37,6 +37,19 @@ public class KetiQuery_wj {
 	public static String index = "test001";
 	public static String type = "type001";
 	public static ObjectMapper mapper = new ObjectMapper();
+
+	public static void main(String[] args) throws UnknownHostException {
+
+		TransportClient client = getClient1withNOxpack();
+		// 通过坐落查询统计相关信息
+		queryByZl(client);
+
+		// 查询指定的不动产单元号列表，批量查询出权利人相关信息
+		// getQyrsByBdcdyhList(client);
+
+		client.close();
+
+	}
 
 	/***
 	 * 查询坐落 模糊查询
@@ -47,42 +60,39 @@ public class KetiQuery_wj {
 	 * @throws UnknownHostException
 	 */
 	public static void queryByZl(TransportClient client) throws UnknownHostException {
-		SearchRequestBuilder srb = client.prepareSearch("keti1").setTypes("keti1").setSize(100);
+		SearchRequestBuilder srb = client.prepareSearch("keti2").setTypes("keti2").setSize(100);
 
-		MatchPhraseQueryBuilder boolQueryQueryBuilder = QueryBuilders.matchPhraseQuery("zl", "中");
-		
-		long start=System.currentTimeMillis();
+		MatchPhraseQueryBuilder boolQueryQueryBuilder = QueryBuilders.matchPhraseQuery("zl", "东城");
+
+		// MatchQueryBuilder boolQueryBuilder= QueryBuilders.matchQuery("zl",
+		// "中");
+
+		long start = System.currentTimeMillis();
 		SearchResponse response = srb.setQuery(boolQueryQueryBuilder).execute().actionGet();
 
-		
-		
 		SearchHits hits = response.getHits();
-		
-		
-		System.out.println("总共有"+hits.getTotalHits()+"条记录");
-		
-		
+
+		System.out.println("总共有" + hits.getTotalHits() + "条记录");
+
 		for (int i = 0; i < hits.getHits().length; i++) {
 			System.out.print("\t_id:" + hits.getHits()[i].getSource().get("_id"));
 			System.out.print("\tqx:" + hits.getHits()[i].getSource().get("qx"));
 			System.out.print("\tzl:" + hits.getHits()[i].getSource().get("zl"));
 			System.out.println("");
 		}
-		
-		long end=System.currentTimeMillis();
-		
-		System.out.println("总耗时："+((end-start))+"豪秒");
+
+		long end = System.currentTimeMillis();
+
+		System.out.println("总耗时：" + ((end - start)) + "豪秒");
 
 	}
 
-	public static void main(String[] args) throws UnknownHostException {
-		
-		TransportClient client = getClient1withNOxpack();
-		queryByZl(client);
-		client.close();
-		
-	}
-
+	/****
+	 * 获取es客户端
+	 * 
+	 * @return TransportClient
+	 * @throws UnknownHostException
+	 */
 	public static TransportClient getClient1withNOxpack() throws UnknownHostException {
 		Settings settings = Settings.builder().put("cluster.name", clustername).build();
 		TransportClient client = new PreBuiltTransportClient(settings);
@@ -95,12 +105,12 @@ public class KetiQuery_wj {
 	}
 
 	/**
-	 * 客体和权利人 不动产单元号 行政区划 展示包含权利人、证件号
-	 *
+	 * 客体和权利人 不动产单元号 行政区划 展示包含权利人、证件号 bdcdyh:130209109640GB04190F344126562
+	 * 
 	 * @param client
 	 * @throws UnknownHostException
 	 */
-	public static void conditionQueryWithoutMethodKetiqlr(TransportClient client) throws UnknownHostException {
+	public static void getRecord0ByBdcdyh(TransportClient client, String bdcdyh) throws UnknownHostException {
 		long a1 = Calendar.getInstance().getTimeInMillis();
 		SearchRequestBuilder responsebuilder = client.prepareSearch("keti").setTypes("keti");
 		SearchRequestBuilder responsebuilder1 = client.prepareSearch("qlr").setTypes("qlr");
@@ -108,13 +118,12 @@ public class KetiQuery_wj {
 		// term查不出来，估计是分词了
 		// TermQueryBuilder boolQueryQueryBuilder =
 		// QueryBuilders.termQuery("bdcdyh", "620522865057GB22282F729085473");
-		MatchQueryBuilder boolQueryQueryBuilder = QueryBuilders.matchQuery("bdcdyh", "130209109640GB04190F344126562");
+		MatchQueryBuilder boolQueryQueryBuilder = QueryBuilders.matchQuery("bdcdyh", bdcdyh);
 		SearchResponse response = responsebuilder.setQuery(boolQueryQueryBuilder).execute().actionGet();
 		SearchHits hits = response.getHits();
 		// System.out.println("客体："+hits.getTotalHits());
 		int temp = 0;
 		for (int i = 0; i < hits.getHits().length; i++) {
-			String bdcdyh = String.valueOf(hits.getHits()[i].getSource().get("bdcdyh"));
 			System.out.print("bdcdyh:" + hits.getHits()[i].getSource().get("bdcdyh"));
 			System.out.print("\tlx:" + hits.getHits()[i].getSource().get("lx"));
 			System.out.print("\tuuid:" + hits.getHits()[i].getSource().get("uuid"));
@@ -122,12 +131,7 @@ public class KetiQuery_wj {
 			System.out.print("\tzl:" + hits.getHits()[i].getSource().get("zl"));
 			System.out.print("\trecords:" + hits.getHits()[i].getSource().get("records"));
 			System.out.print("\tpostDate:" + hits.getHits()[i].getSource().get("postDate") + "\n");
-			/*
-			 * BoolQueryBuilder boolQueryQueryBuilder1 =
-			 * QueryBuilders.boolQuery()
-			 * .should(QueryBuilders.termQuery("bdcdyh", bdcdyh))
-			 * .should(QueryBuilders.termQuery("records", "0"));
-			 */
+
 			BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 					.must(QueryBuilders.matchQuery("bdcdyh", bdcdyh)).must(QueryBuilders.termQuery("records", "0"));
 			SearchResponse response1 = responsebuilder1.setQuery(boolQueryQueryBuilder1).execute().actionGet();
@@ -144,13 +148,13 @@ public class KetiQuery_wj {
 		System.out.println("    2:" + formatDate.format(new Date()));
 	}
 
-	/**
-	 * 客体无条件查询，先批量查出客体，再查询权利人 客体和权利人 不动产单元号 行政区划 展示包含权利人、证件号
-	 *
+	/****
+	 * 查询指定的不动产单元号列表，批量查询出权利人相关信息
+	 * 
 	 * @param client
 	 * @throws UnknownHostException
 	 */
-	public static void noconditionQueryKetiqlrnoSystem(TransportClient client) throws UnknownHostException {
+	public static void getQyrsByBdcdyhList(TransportClient client) throws UnknownHostException {
 
 		// 首先获取课题的100条信息
 		SearchResponse response = client.prepareSearch("keti1").setTypes("keti1").setSize(100).execute().actionGet();
