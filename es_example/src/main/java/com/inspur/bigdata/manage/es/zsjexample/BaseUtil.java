@@ -31,7 +31,8 @@ public class BaseUtil {
 	 * @return
 	 */
 	public static String getRandomTime(String startStr, String endStr) {
-
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	    SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		try {
 			Date start = format.parse(startStr);
 			Date end = format.parse(endStr);// 构造结束日期

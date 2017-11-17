@@ -38,14 +38,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  */
 public class ESUtils {
-	
+
 	public static void main(String[] args) throws UnknownHostException, IOException {
-		createIndex(getClient("es", "10.110.13.176"), "keti2","keti2",5,3);
+		createIndex(getClient("es", "10.110.13.176"), "ql3", "ql3", 5, 3);
+		//writeDocument(getClient("es", "10.110.13.176"), "keti3", "keti3");
 	}
+
 	public static void createIndex(TransportClient client, String indexName, String type, int shareds, int replices)
 			throws IOException {
 		XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject("settings")
-				.field("index.number_of_shards",shareds).field("number_of_replicas",replices).endObject().endObject();
+				.field("index.number_of_shards", shareds).field("number_of_replicas", replices).endObject().endObject();
 
 		CreateIndexRequestBuilder cirb = client.admin().indices().prepareCreate(indexName).setSource(mapping);
 		CreateIndexResponse response = cirb.execute().actionGet();
@@ -58,7 +60,7 @@ public class ESUtils {
 
 	}
 
-	public static TransportClient getClient(String clustername,String hostname) throws UnknownHostException {
+	public static TransportClient getClient(String clustername, String hostname) throws UnknownHostException {
 		Settings settings = Settings.builder().put("cluster.name", clustername).build();
 		TransportClient client = new PreBuiltTransportClient(settings);
 		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(hostname), 9300));
@@ -67,9 +69,10 @@ public class ESUtils {
 
 	/**
 	 * 索引列表
+	 * 
 	 * @throws UnknownHostException
 	 */
-	public static void  listIndex(TransportClient client) throws UnknownHostException {
+	public static void listIndex(TransportClient client) throws UnknownHostException {
 		ClusterStateResponse response = client.admin().cluster().prepareState().execute().actionGet();
 		// 获取所有索引
 		String[] indexs = response.getState().getMetaData().getConcreteAllIndices();
@@ -80,9 +83,10 @@ public class ESUtils {
 
 	/**
 	 * 创建索引
+	 * 
 	 * @throws UnknownHostException
 	 */
-	public static void createIndex(TransportClient client,String indexName) throws UnknownHostException {
+	public static void createIndex(TransportClient client, String indexName) throws UnknownHostException {
 		CreateIndexRequest cIndexRequest = new CreateIndexRequest(indexName);
 		CreateIndexResponse cIndexResponse = client.admin().indices().create(cIndexRequest).actionGet();
 		if (cIndexResponse.isAcknowledged()) {
@@ -94,9 +98,10 @@ public class ESUtils {
 
 	/**
 	 * 判断索引是否存在
+	 * 
 	 * @throws UnknownHostException
 	 */
-	public static void existIndex(TransportClient client,String indexName) throws UnknownHostException {
+	public static void existIndex(TransportClient client, String indexName) throws UnknownHostException {
 		IndicesAdminClient indicesAdminClient = client.admin().indices();
 		IndicesExistsResponse response = indicesAdminClient.prepareExists(indexName).get();
 		if (response.isExists()) {
@@ -106,7 +111,7 @@ public class ESUtils {
 		}
 	}
 
-	public static void listTypes(TransportClient client,String indexName) throws UnknownHostException {
+	public static void listTypes(TransportClient client, String indexName) throws UnknownHostException {
 		List<String> typeList = new ArrayList<String>();
 		try {
 			GetMappingsResponse res = client.admin().indices().getMappings(new GetMappingsRequest().indices(indexName))
@@ -126,33 +131,40 @@ public class ESUtils {
 
 	/**
 	 * 写入数据
+	 * 
 	 * @throws IOException
 	 */
-	public static void writeDocument(TransportClient client,String indexName,String typeName) throws IOException {
+	public static void writeDocument(TransportClient client, String indexName, String typeName) throws IOException {
 		XContentBuilder jsonBuild1 = XContentFactory.jsonBuilder();
-		XContentBuilder jsonBuild2 = XContentFactory.jsonBuilder();
-		XContentBuilder jsonBuild3 = XContentFactory.jsonBuilder();
-		XContentBuilder jsonBuild4 = XContentFactory.jsonBuilder();
-		XContentBuilder jsonBuild5 = XContentFactory.jsonBuilder();
+		// XContentBuilder jsonBuild2 = XContentFactory.jsonBuilder();
+		// XContentBuilder jsonBuild3 = XContentFactory.jsonBuilder();
+		// XContentBuilder jsonBuild4 = XContentFactory.jsonBuilder();
+		// XContentBuilder jsonBuild5 = XContentFactory.jsonBuilder();
 		ObjectMapper mapper = new ObjectMapper();
 		List<String> jsonData = new ArrayList<String>();
-		String data1 = jsonBuild1.startObject().field("id", "1").field("title", "git简介").field("date", "2016-06-19")
-				.field("message", "SVN与Git最主要的区别").endObject().string();
-		String data2 = jsonBuild2.startObject().field("id", "2").field("title", "Java中泛型的介绍与简单使用")
-				.field("date", "2016-06-19").field("message", "学习目标掌握泛型的产生意义").endObject().string();
-
-		String data3 = jsonBuild3.startObject().field("id", "3").field("title", "SQL基本操作").field("date", "2016-06-19")
-				.field("message", "基本操作：CRUD").endObject().string();
-
-		String data4 = jsonBuild4.startObject().field("id", "4").field("title", "Hibernate框架基础")
-				.field("date", "2016-06-19").field("message", "Hibernate框架基础").endObject().string();
-		String data5 = jsonBuild5.startObject().field("id", "5").field("title", "Shell基本知识").field("date", "2016-06-19")
-				.field("message", "Shell是什么").endObject().string();
+		String data1 = jsonBuild1.startObject().field("lx", "9").field("uuid","ddddd").field("bdcdyh", "530400016859GB96049F773277343")
+				.field("qx", "150722").field("zl","市中").endObject().string();
+		// String data2 = jsonBuild2.startObject().field("id",
+		// "2").field("title", "Java中泛型的介绍与简单使用")
+		// .field("date", "2016-06-19").field("message",
+		// "学习目标掌握泛型的产生意义").endObject().string();
+		//
+		// String data3 = jsonBuild3.startObject().field("id",
+		// "3").field("title", "SQL基本操作").field("date", "2016-06-19")
+		// .field("message", "基本操作：CRUD").endObject().string();
+		//
+		// String data4 = jsonBuild4.startObject().field("id",
+		// "4").field("title", "Hibernate框架基础")
+		// .field("date", "2016-06-19").field("message",
+		// "Hibernate框架基础").endObject().string();
+		// String data5 = jsonBuild5.startObject().field("id",
+		// "5").field("title", "Shell基本知识").field("date", "2016-06-19")
+		// .field("message", "Shell是什么").endObject().string();
 		jsonData.add(data1);
-		jsonData.add(data2);
-		jsonData.add(data3);
-		jsonData.add(data4);
-		jsonData.add(data5);
+		// jsonData.add(data2);
+		// jsonData.add(data3);
+		// jsonData.add(data4);
+		// jsonData.add(data5);
 		for (int i = 0; i < jsonData.size(); i++) {
 			IndexResponse response = client.prepareIndex(indexName, typeName).setId(String.valueOf(i + 1))
 					.setSource(jsonData.get(i), XContentType.JSON).get();
@@ -162,10 +174,12 @@ public class ESUtils {
 
 	/**
 	 * 查询数据
+	 * 
 	 * @throws UnknownHostException
 	 * @throws JsonProcessingException
 	 */
-	public static void queryDocument(TransportClient client,String indexName,String typeName) throws UnknownHostException, JsonProcessingException {
+	public static void queryDocument(TransportClient client, String indexName, String typeName)
+			throws UnknownHostException, JsonProcessingException {
 		SearchResponse response = client.prepareSearch(indexName).setTypes(typeName).execute().actionGet();
 		// 获取响应字符串
 		System.out.println(response.toString());
@@ -179,9 +193,11 @@ public class ESUtils {
 
 	/**
 	 * 删除数据
+	 * 
 	 * @throws UnknownHostException
 	 */
-	public static void deleteDocument(TransportClient client,String indexName,String typeName,String documentID) throws UnknownHostException {
+	public static void deleteDocument(TransportClient client, String indexName, String typeName, String documentID)
+			throws UnknownHostException {
 		DeleteResponse response = client.prepareDelete(indexName, typeName, documentID).get();
 	}
 }
