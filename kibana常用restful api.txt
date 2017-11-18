@@ -1,0 +1,379 @@
+#查询集群索引  内存情况
+GET _cat/indices 
+
+GET /_nodes
+
+GET  /_cat/shards
+
+GET /keti/_count
+
+GET keti/_search
+{
+   "_source": {
+       "include": ["bdcdyh"],
+     "excludes" : ["path3.*"]
+   }
+}
+
+get keti/_search
+
+GET /qlr/_count
+GET ql/count
+
+GET ql3/_mapping
+
+GET qlr3/_mapping
+
+GET qlr/_search
+{
+  "_source": {
+       "include": ["zjh","xm","dw"],
+     "excludes" : ["path3.*"]
+   }
+
+ 
+}
+
+
+
+GET keti/_search
+
+
+GET qlr3/_count
+
+GET keti3/_count
+
+GET ql3/_count
+
+GET ql3/_search
+
+GET qlr3/_search
+
+GET keti/_search
+{
+  "query":{
+    "bool":{
+      "must":[
+        {
+          "match": {"bdcdyh":"220200597688GB49899F443770431"}
+        }
+        ]
+    }
+  }
+ 
+}
+
+DELETE  keti3
+
+PUT  keti3
+{
+    "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+      "mappings": {
+      "keti3": {
+        "properties": {
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "lx": {
+            "type": "keyword"
+          },
+          "postDate": {
+            "type": "date","format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "qx": {
+            "type": "keyword"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "keyword"
+          },
+          "zl": {
+            "type": "text",
+            "analyzer": "ik_max_word"
+          }
+        }
+      }
+    }
+}
+
+
+DELETE  ql3
+
+PUT ql3
+{
+   "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+      "mappings": {
+      "ql": {
+        "properties": {
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "postDate": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "qllx": {
+            "type": "keyword"
+          },
+          "qlxz": {
+            "type": "keyword"
+          },
+          "qx": {
+            "type": "keyword"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+}
+
+
+DELETE  qlr3
+
+PUT  qlr3
+{
+        "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+      "mappings": {
+      "qlr": {
+        "properties": {
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "dw": {
+            "type": "text",
+            "analyzer": "ik_max_word"
+          },
+          "lx": {
+            "type": "keyword"
+          },
+          "postDate": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "qluuid": {
+            "type": "keyword"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "keyword"
+          },
+          "xm": {
+            "type": "text",
+            "analyzer": "ik_max_word"
+          },
+          "zjh": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+}
+
+GET keti3/_mapping
+
+PUT  keti3
+{
+  "mappings": {
+    "keti3": {
+      "properties": {
+        "bdcdyh": {
+          "type":  "keyword"
+        },
+        "lx": {
+          "type":  "keyword"
+        },
+        "uuid": {
+          "type":  "keyword"
+        },
+        "qx": {
+          "type":  "keyword"
+        },
+        "records": {
+          "type":  "integer"
+        },
+        "postDate": {
+          "type":  "date"
+        },
+        "zl": {
+          "type":  "text",
+          "analyzer":"ik_max_word"
+        }
+      }
+    }
+  }
+}
+
+
+PUT keti2
+{
+  "mappings": {
+    "keti2": {
+      "properties": {
+        "bdcdyh": {
+          "type":  "keyword"
+        },
+        "lx": {
+          "type":  "keyword"
+        },
+        "uuid": {
+          "type":  "keyword"
+        },
+        "qx": {
+          "type":  "keyword"
+        },
+        "records": {
+          "type":  "integer"
+        },
+        "postDate": {
+          "type":  "date"
+        },
+        "zl": {
+          "type":  "text",
+          "analyzer":"ik_max_word"
+        }
+      }
+    }
+  }
+}
+
+GET keti2/_mapping
+
+GET study1/_search
+GET qlr/_search
+
+GET ql/_search
+
+GET test/test/_search
+
+GET ketiindex/keti/_search
+
+GET ketiindex/qlr/_search
+
+DELETE test
+
+GET /metricbeat-2017.10.23/_count
+
+
+GET /pageindex/_settings
+
+PUT /pageindex/_settings
+{ "index" : { "max_result_window" : 10000}}
+
+ GET /keti/_search
+{
+       "query": {
+        "match" : {
+            "bdcdyh" : "330801191589GB71086F260524894"
+      }
+      }
+}
+ GET /qlr/_search
+{
+       "query": {
+        "match" : {
+            "bdcdyh" : "431381739195GB63614F118536438"
+      }
+      }
+}
+ GET /qlr/_search
+{
+       "query": {
+        "match" : {
+            "zjh" : "420117199206082091"
+      }
+      }
+}
+ GET /qlr/_search
+{
+       "query": {
+        "term" : {
+            "bdcdyh" : "71de7d0bc8d3484aaa519fcff9668884"
+      }
+      }
+}
+
+GET /keti1/keti1/_count
+
+GET /keti1/keti1/_search
+{ 
+   "size":4000,
+    "query": {
+    "match":{
+       "qx" : "440233"
+    }
+  }
+}
+
+ GET /keti/_search
+{
+  "size":100,
+       "query": {
+        "match" : {
+            "qx" : "440823"
+        }
+    }
+}
+
+ GET /keti/_search
+{
+       "query": {
+        "match" : {
+            "zl" : "湛江"
+        }
+    }
+}
+ 
+
+ GET /keti/_search
+{
+       "query": {
+        "match" : {
+            "bdcdyh" : "620522865057GB22282F729085473",
+            "lx": "5"
+        }
+    }
+}
+
+ GET /keti/_search
+{
+       "query":{
+          "bool": {
+            "must": [
+                { "match": { "bdcdyh": "620522865057GB22282F729085473" }},
+                { "match": { "lx":  "5" }}
+            ]
+        }
+}
+}
+
+GET _cat/nodes?v
+GET /pageindex/_mapping/tweet
+
+GET /pageindex/tweet/_search
+{
+    "from" : 1, "size" : 3,
+    "query" : {
+        "term" : { "user" : "a" }
+    }
+}

@@ -6,15 +6,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.get.MultiGetItemResponse;
-import org.elasticsearch.action.get.MultiGetResponse;
-import org.elasticsearch.action.search.MultiSearchRequestBuilder;
-import org.elasticsearch.action.search.MultiSearchResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -24,7 +22,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -32,32 +29,80 @@ import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class KetiQuery_WJ {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-	public static String hostname = "10.110.13.176";
+	// public static String hostname = "10.110.13.179";
 	// public static String hostname = "localhost";
 	public static String clustername = "es";
-	public static String index = "test001";
-	public static String type = "type001";
-	public static ObjectMapper mapper = new ObjectMapper();
+	// public static String index = "test001";
+	// public static String type = "type001";
 
 	public static void main(String[] args) throws UnknownHostException {
 
 		TransportClient client = getClient1withNOxpack();
+
+		List<Long> costTimes = new ArrayList<Long>();
+
+		String[] qlrdws = { "猪妙脉劝锈廷叶医寞术恶拖", "屁鲜殿试逞水碴翟际乌庆滇", "勒螺渐羚仿礁桨墅质捏哩喷", "梆焦夷甄迷症留含言犊针撕", "线淹源畴诵墩悟乎兵镣十嚼",
+				"棱慌浦典秧劝弗圃感香蜡原", "啤翻禾藻碾玻桔斩沈碌社殖", "鸥亲枕瘴痛较诗痊邓卵剿父", "扎星厄品粹课师雕谦拎彰弄", "牲钱午沉包如旋兔楷惮酱阑" };
+
+		String[] qlrXms = { "闾时进", "夏秋伊", "经保杰", "东凡茗", "郜新言", "荣信以", "督咏", "牧强", "薛馨瑞", "乐亮" };
+
+		String[] qlrzjhs = { "230600198010015006", "640522196211247516", "440115197308022999", "652122198411309639",
+				"230506195402259308", "530127198403314086", "140622197803265779", "542425197704155261",
+				"460323197507098894", "141029198210295240" };
+
+		String[] bdcdyhs = { "330483421408GB77120F591008209", "330402051645GB43350F523170557",
+				"530802557464GB69603F290520285", "654025556740GB81649F582450513", "611024402330GB55349F273907421",
+				"610627677378GB74622F583795434", "542421819466GB98305F270018307", "370827355063GB00075F443900854",
+				"530122207927GB92318F487692347", "650201882330GB77222F839038732" };
+
+		// for (int i = 0; i < 10; i++) {
+		//
+		// try {
+
+		// 根据权利人 查出不动产数量
+		// costTimes.add(queryQlrBdcNum(client, "qlr", "qlr", qlrXms[i],
+		// qlrzjhs[i]));
+
+		// 场景：根据权利人证件号码查询 统计耗时
+		// costTimes.add(chaXunQlrByConditionByFilter(client, "qlr",
+		// "qlr", "zjh", qlrzjhs[i]));
+
+		// Thread.sleep(4);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		//
+		// Long allCost = 0L;
+		// for (Long cost : costTimes) {
+		// allCost += cost;
+		// System.out.print(cost + "\t");
+		// }
+		//
+		// System.out.println("平均耗时：" + allCost / 10);
+
 		// 通过坐落查询统计相关信息
 		// queryByZl(client);
 
 		// 查询指定的不动产单元号列表，批量查询出权利人相关信息
-		// getQyrsByBdcdyhList(client);
+		// getQyrsByBdcdyhListByShold(client, "keti", "keti", 100);
+		// getQyrsByBdcdyhListByFilter(client, "keti", "keti", 100);
 
 		// 根据lx和record查询记录
 		// chaXunKtByRecordLx(client,"keti3","keti3",500,"10","0");
 		// chaXunKtByRecordLx(client,"keti2","keti2",100,"10","0");
 
 		// 查询权利人通过证件号
-		// chaXunQlrByQlrNm(client,"qlr","qlr","530926200511284379");
+		// chaXunQlrByConditionByMust(client,"qlr","qlr","zjh","230600198010015006");
+		// chaXunQlrByConditionByFilter(client, "qlr", "qlr", "zjh",
+		// "230600198010015006");
+
+		// 查询权利人不动产单元号
+		// chaXunQlrByConditionByFilter(client, "qlr", "qlr", "bdcdyh",
+		// "330400934373GB28301F427478609");
+		// chaXunQlrByConditionByMust(client,"qlr","qlr","bdcdyh","330400934373GB28301F427478609");
 
 		// 根据不动产单元号 查keti信息
 		// chaXunKetiByBdcdyh(client,"keti3","keti3","150722869801GB95231F358313817");
@@ -73,12 +118,51 @@ public class KetiQuery_WJ {
 		// 421182866490GB18165F331396000
 		// chaXunKetiByBdcdyh(client, "keti3",
 		// "keti3","421182866490GB18165F331396000");
-		
-		//根据查询条件查询权利人 索引信息   包括权利人不动产数量
-		chaXunQlrByCondition(client, "qlr", "qlr","bdcdyh","450804464313GB13560F768258634");
-		
-		
+
+		// 根据权利人证件号 查询权利人不动产数量 以及展示不动产信息
+		// queryQlrBdcNum(client, "qlr", "qlr", "zjh", "230600198010015006");
+
+		// 统计场景1
+		tjBdcNumByCondition(client);
 		client.close();
+
+	}
+
+	/***
+	 * 场景1
+	 * 
+	 * @param client
+	 * @param index
+	 * @param type
+	 * @param ndcdyh
+	 * @return
+	 */
+	private static void tjBdcNumByCondition(TransportClient client) {
+
+		long start = System.currentTimeMillis();
+		SearchRequestBuilder srb = client.prepareSearch("keti").setTypes("keti");
+		TermsAggregationBuilder gradeTermsBuilder = AggregationBuilders.terms("qxtj").field("qx").size(100);
+		// ValueCountAggregationBuilder gradeTermsBuilder =
+		// AggregationBuilders.count("gradeAgg").field("qx");
+		srb.addAggregation(gradeTermsBuilder);
+		//
+		BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
+				.filter(QueryBuilders.termQuery("records", "0"));
+
+		SearchResponse sr = srb.setQuery(boolQueryQueryBuilder1).execute().actionGet();
+		Map<String, Aggregation> aggMap = sr.getAggregations().asMap();
+		StringTerms gradeTerms = (StringTerms) aggMap.get("qxtj");
+		Iterator<StringTerms.Bucket> gradeBucketIt = gradeTerms.getBuckets().iterator();
+		long a = 0;
+		// while (gradeBucketIt.hasNext()) {
+		// StringTerms.Bucket gradeBucket = gradeBucketIt.next();
+		// System.out.println(gradeBucket.getKey() + "地区有" +
+		// gradeBucket.getDocCount() + "条记录。");
+		// a = a + gradeBucket.getDocCount();
+		// }
+
+		long end = System.currentTimeMillis();
+		System.out.println("总共记录条数：" + String.valueOf(a) + "耗时：" + (end - start) + "ms");
 
 	}
 
@@ -90,23 +174,17 @@ public class KetiQuery_WJ {
 	 * @param type
 	 * @param ndcdyh
 	 */
-	private static void chaXunKetiByBdcdyh(TransportClient client, String index, String type, String ndcdyh) {
+	private static Long chaXunKetiByBdcdyh(TransportClient client, String index, String type, String ndcdyh) {
 
 		SearchRequestBuilder responsebuilder1 = client.prepareSearch(index).setTypes(type);
 
 		long start = System.currentTimeMillis();
 		BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.matchQuery("bdcdyh", ndcdyh)).must(QueryBuilders.termQuery("records", "0"));
+				.filter(QueryBuilders.matchQuery("bdcdyh", ndcdyh)).filter(QueryBuilders.termQuery("records", "0"));
 		SearchResponse response1 = responsebuilder1.setQuery(boolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
-		
-		
 
 		for (int j = 0; j < hits1.getHits().length; j++) {
-			// System.out.print("\txm:" +
-			// hits1.getHits()[j].getSource().get("xm"));
-			// System.out.print("\tzjh:" +
-			// hits1.getHits()[j].getSource().get("zjh"));
 			System.out.print("\tbdcdyh:" + hits1.getHits()[j].getSource().get("bdcdyh"));
 			System.out.print("\trecords:" + hits1.getHits()[j].getSource().get("records"));
 		}
@@ -114,6 +192,121 @@ public class KetiQuery_WJ {
 		long end = System.currentTimeMillis();
 
 		System.out.println("总耗时：" + (end - start) + "ms");
+
+		return hits1.getHits().length > 0 ? end - start : 0;
+
+	}
+
+	/****
+	 * 查询场景：查询权利人不动产数量，根据权利人证件查询
+	 * 
+	 * @param client
+	 * @param index
+	 * @param type
+	 * @param column
+	 * @param columnValue
+	 * @return
+	 */
+	private static Long queryQlrBdcNum(TransportClient client, String index, String type, String name, String zjhm) {
+
+		SearchRequestBuilder responsebuilder1 = client.prepareSearch(index).setTypes(type);
+
+		long start = System.currentTimeMillis();
+
+		BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery();
+
+		if (StringUtils.isBlank(name) && StringUtils.isBlank(zjhm)) {
+			System.out.println("查询条件不能为空");
+			return null;
+		}
+
+		if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(zjhm)) {
+			boolQueryQueryBuilder1.must(QueryBuilders.matchPhraseQuery("xm", name))
+					.must(QueryBuilders.matchPhraseQuery("zjh", zjhm)).filter(QueryBuilders.termQuery("records", 0));
+		} else if (StringUtils.isNotBlank(name)) {
+			boolQueryQueryBuilder1.filter(QueryBuilders.matchPhraseQuery("xm", name))
+					.filter(QueryBuilders.termQuery("records", 0));
+		} else {
+			boolQueryQueryBuilder1.filter(QueryBuilders.matchPhraseQuery("zjh", zjhm))
+					.filter(QueryBuilders.termQuery("records", 0));
+		}
+
+		SearchResponse response1 = responsebuilder1.setQuery(boolQueryQueryBuilder1).execute().actionGet();
+		SearchHits hits1 = response1.getHits();
+
+		List<String> bdcList = new ArrayList<String>();
+		for (int j = 0; j < hits1.getHits().length; j++) {
+			String bdcdyh = String.valueOf(hits1.getHits()[j].getSource().get("bdcdyh"));
+			System.out.print("\txm:" + hits1.getHits()[j].getSource().get("xm"));
+			System.out.print("\tzjh:" + hits1.getHits()[j].getSource().get("zjh"));
+			System.out.print("\tbdcdyh:" + bdcdyh);
+			System.out.print("\trecords:" + hits1.getHits()[j].getSource().get("records"));
+
+			bdcList.add(bdcdyh);
+		}
+
+		BoolQueryBuilder ketiBuilder = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("records", "0"))
+				.filter(QueryBuilders.termsQuery("bdcdyh", bdcList));
+		SearchRequestBuilder ketiSearchRb = client.prepareSearch("keti").setTypes("keti");
+
+		SearchResponse ketiResponse = ketiSearchRb.setQuery(ketiBuilder).execute().actionGet();
+
+		SearchHits ketiHits = ketiResponse.getHits();
+
+		Set<String> bdcSet = new HashSet<String>();
+
+		System.out.println("不动产列表为：");
+		for (int m = 0; m < ketiHits.getTotalHits(); m++) {
+
+			String bdcdyh = String.valueOf(ketiHits.getHits()[m].getSource().get("bdcdyh"));
+
+			bdcSet.add(bdcdyh);
+
+			System.out.print(bdcdyh);
+		}
+
+		System.out.println("权利人：" + name + "," + zjhm + "\t 有不动产数量：" + bdcSet.size());
+
+		long end = System.currentTimeMillis();
+
+		System.out.println("总耗时：" + (end - start) + "ms");
+
+		return (end - start);
+
+	}
+
+	/****
+	 * 根据权利人证件号码 查询权利人信息
+	 * 
+	 * @param client
+	 * @param index
+	 * @param type
+	 * @param column
+	 * @param columnValue
+	 */
+	private static Long chaXunQlrByConditionByFilter(TransportClient client, String index, String type, String column,
+			String columnValue) {
+
+		SearchRequestBuilder responsebuilder1 = client.prepareSearch(index).setTypes(type);
+
+		long start = System.currentTimeMillis();
+		BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
+				.filter(QueryBuilders.termQuery(column, columnValue)).filter(QueryBuilders.termQuery("records", "0"));
+		SearchResponse response1 = responsebuilder1.setQuery(boolQueryQueryBuilder1).execute().actionGet();
+		SearchHits hits1 = response1.getHits();
+
+		for (int j = 0; j < hits1.getHits().length; j++) {
+			System.out.print("\txm:" + hits1.getHits()[j].getSource().get("xm"));
+			System.out.print("\tzjh:" + hits1.getHits()[j].getSource().get("zjh"));
+			System.out.print("\tbdcdyh:" + hits1.getHits()[j].getSource().get("bdcdyh"));
+			System.out.print("\trecords:" + hits1.getHits()[j].getSource().get("records"));
+		}
+
+		long end = System.currentTimeMillis();
+
+		System.out.println("总耗时：" + (end - start) + "ms");
+
+		return hits1.getHits().length > 0 ? (end - start) : 0;
 
 	}
 
@@ -125,7 +318,8 @@ public class KetiQuery_WJ {
 	 * @param type
 	 * @param qlrNm
 	 */
-	private static void chaXunQlrByCondition(TransportClient client, String index, String type, String column,String columnValue) {
+	private static long chaXunQlrByConditionByMust(TransportClient client, String index, String type, String column,
+			String columnValue) {
 
 		SearchRequestBuilder responsebuilder1 = client.prepareSearch(index).setTypes(type);
 
@@ -145,6 +339,7 @@ public class KetiQuery_WJ {
 		long end = System.currentTimeMillis();
 
 		System.out.println("总耗时：" + (end - start) + "ms");
+		return hits1.getHits().length > 0 ? (end - start) : 0;
 
 	}
 
@@ -197,7 +392,13 @@ public class KetiQuery_WJ {
 		// InetSocketTransportAddress(InetAddress.getByName("host1"), 9300))
 		// .addTransportAddress(new
 		// InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(hostname), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
+
 		return client;
 	}
 
@@ -255,7 +456,7 @@ public class KetiQuery_WJ {
 	 * @param query
 	 * @throws UnknownHostException
 	 */
-	public static void getQyrsByCondition(TransportClient client, String index, String type, int size,
+	public static Long getQyrsByCondition(TransportClient client, String index, String type, int size,
 			BoolQueryBuilder query) throws UnknownHostException {
 
 		long start = System.currentTimeMillis();
@@ -280,8 +481,7 @@ public class KetiQuery_WJ {
 			// 以查询到的客体不动产单元号 作为权利人的 查询条件
 			String bdcbh = String.valueOf(ketiHits.getHits()[i].getSource().get("bdcdyh"));
 			BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-					/* .must(QueryBuilders.termQuery("records", "0")) */.must(
-							QueryBuilders.matchQuery("bdcdyh", bdcbh));
+					.filter(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termQuery("bdcdyh", bdcbh));
 			// System.out.println("\t keti bdcdyh:" + bdcbh + "\n");
 
 			long qlrstrt = System.currentTimeMillis();
@@ -303,18 +503,19 @@ public class KetiQuery_WJ {
 
 		System.out.println("总耗时：" + (end - start) + "ms");
 
-		System.out.println("qlr 耗时:" + qlrCost + "ms");
-
-		System.out.println("keti cost:" + (endketi - start) + "ms");
+		return ketiHits.getTotalHits() != 0 ? end - start : 0;
 	}
 
-	/****
-	 * 查询指定的不动产单元号列表，批量查询出权利人相关信息
+	/***
+	 * 根据不动产列表查询权利人
 	 * 
 	 * @param client
+	 * @param index
+	 * @param type
+	 * @param size
 	 * @throws UnknownHostException
 	 */
-	public static void getQyrsByBdcdyhList(TransportClient client, String index, String type, int size)
+	public static void getQyrsByBdcdyhListByFilter(TransportClient client, String index, String type, int size)
 			throws UnknownHostException {
 
 		long start = System.currentTimeMillis();
@@ -325,12 +526,51 @@ public class KetiQuery_WJ {
 
 		BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("records", "0"));
+		List<String> bdcdyhs = new ArrayList<String>();
 		for (int i = 0; i < hits.getHits().length; i++) {
-
-			String bdcbh = String.valueOf(hits.getHits()[i].getSource().get("bdcdyh"));
-			boolQueryQueryBuilder1.should(QueryBuilders.matchQuery("bdcdyh", bdcbh));
-
+			bdcdyhs.add(String.valueOf(hits.getHits()[i].getSource().get("bdcdyh")));
 		}
+
+		boolQueryQueryBuilder1.filter(QueryBuilders.termsQuery("bdcdyh", bdcdyhs));
+
+		SearchRequestBuilder responsebuilder1 = client.prepareSearch("qlr").setTypes("qlr");
+		SearchResponse response1 = responsebuilder1.setQuery(boolQueryQueryBuilder1).execute().actionGet();
+		SearchHits hits1 = response1.getHits();
+		for (int j = 0; j < hits1.getHits().length; j++) {
+			System.out.print("\txm:" + hits1.getHits()[j].getSource().get("xm"));
+			System.out.print("\tbdc:" + hits1.getHits()[j].getSource().get("bdcdyh"));
+			System.out.print("\tzjh:" + hits1.getHits()[j].getSource().get("zjh"));
+			System.out.print("\trecords:" + hits1.getHits()[j].getSource().get("records") + "\n");
+		}
+
+		long end = System.currentTimeMillis();
+
+		System.out.println("总耗时：" + (end - start) + "ms");
+	}
+
+	/****
+	 * 查询指定的不动产单元号列表，批量查询出权利人相关信息
+	 * 
+	 * @param client
+	 * @throws UnknownHostException
+	 */
+	public static void getQyrsByBdcdyhListByShold(TransportClient client, String index, String type, int size)
+			throws UnknownHostException {
+
+		long start = System.currentTimeMillis();
+
+		// 首先获取课题的100条信息
+		SearchResponse response = client.prepareSearch(index).setTypes(type).setSize(size).execute().actionGet();
+		SearchHits hits = response.getHits();
+
+		BoolQueryBuilder boolQueryQueryBuilder1 = QueryBuilders.boolQuery()
+				.must(QueryBuilders.termQuery("records", "0"));
+		List<String> bdcdyhs = new ArrayList<String>();
+		for (int i = 0; i < hits.getHits().length; i++) {
+			bdcdyhs.add(String.valueOf(hits.getHits()[i].getSource().get("bdcdyh")));
+		}
+
+		boolQueryQueryBuilder1.should(QueryBuilders.termsQuery("bdcdyh", bdcdyhs));
 
 		SearchRequestBuilder responsebuilder1 = client.prepareSearch("qlr").setTypes("qlr");
 		SearchResponse response1 = responsebuilder1.setQuery(boolQueryQueryBuilder1).execute().actionGet();
