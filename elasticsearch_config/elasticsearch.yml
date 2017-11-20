@@ -1,0 +1,28 @@
+path.data: /hadoop/hdfs/data3/esdata/data
+
+path.logs: /hadoop/hdfs/data3/esdata/log
+
+http.port: 9200
+
+cluster.name: es
+
+
+node.name: node-174
+
+network.host: 10.110.13.174
+
+discovery.zen.ping.unicast.hosts: ["10.110.13.174","10.110.13.175","10.110.13.176", "10.110.13.177", "10.110.13.178", "10.110.13.179"]
+
+http.cors.enabled: true
+
+http.cors.allow-origin: "*"
+
+http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
+
+http.cors.allow-headers: "X-Requested-With, Content-Type, Content-Length, X-User"
+
+node.master: true
+
+node.data: true
+
+discovery.zen.minimum_master_nodes: 2
