@@ -1,12 +1,16 @@
-#查询集群索引  内存情况
-GET _cat/indices 
+#查看 各个索引数据情况
+GET _cat/indices
 
+#查看节点信息
 GET /_nodes
 
+#查看各个分片是否启动
 GET  /_cat/shards
 
+#查看索引的总数量
 GET /keti/_count
 
+#指定索引的某字段查看
 GET keti/_search
 {
    "_source": {
@@ -15,24 +19,60 @@ GET keti/_search
    }
 }
 
-get keti/_search
+#模糊匹配 zjh 是420117199206082091 的文档
+ GET /qlr/_search
+{
+       "query": {
+        "match" : {
+            "zjh" : "420117199206082091"
+      }
+      }
+}
 
-GET /qlr/_count
-GET ql/count
 
-GET ql3/_mapping
+ GET /qlr/_search
 
-GET qlr3/_mapping
+#精确匹配不分词
+ GET /qlr/_search
+{
+       "query":{
+          "bool": {
+            "must": [
+                { "match_phrase_prefix": { "xm": "禄娥晓" }},
+                { "match_phrase_prefix": { "dw":  "镀肠属欢娥赏导洞檄梧壤兜" }}
+            ]
+        }
+}
+}
 
+#查询索引 指定返回条数，默认分会10条记录
 GET qlr/_search
 {
+  "size": 100, 
   "_source": {
-       "include": ["zjh","xm","dw"],
+       "include": ["zjh","xm","dw","bdcdyh"],
      "excludes" : ["path3.*"]
    }
 
  
 }
+
+get keti/_search
+
+GET /qlr/_count
+GET ql/count
+
+
+#获取索引映射
+GET ql3/_mapping
+
+GET qlr3/_mapping
+
+
+
+
+
+
 
 
 
@@ -45,17 +85,18 @@ GET keti3/_count
 
 GET ql3/_count
 
-GET ql3/_search
+GET ql/_search
 
-GET qlr3/_search
+GET qlr/_search
 
-GET keti/_search
+#布尔查询 模糊匹配
+GET qlr/_search
 {
   "query":{
     "bool":{
       "must":[
         {
-          "match": {"bdcdyh":"220200597688GB49899F443770431"}
+          "match": {"zjh":"44148120060520222X"}
         }
         ]
     }
@@ -63,8 +104,18 @@ GET keti/_search
  
 }
 
-DELETE  keti3
+GET keti/_search
+{
+  "size": 100, 
+  "_source": {
+       "include": ["qx","zl","bdcdyh"],
+     "excludes" : ["path3.*"]
+   }
 
+ 
+}DELETE  keti3
+
+#创建索引，并且添加映射和setting信息
 PUT  keti3
 {
     "settings" : {
@@ -296,22 +347,7 @@ PUT /pageindex/_settings
       }
       }
 }
- GET /qlr/_search
-{
-       "query": {
-        "match" : {
-            "zjh" : "420117199206082091"
-      }
-      }
-}
- GET /qlr/_search
-{
-       "query": {
-        "term" : {
-            "bdcdyh" : "71de7d0bc8d3484aaa519fcff9668884"
-      }
-      }
-}
+
 
 GET /keti1/keti1/_count
 

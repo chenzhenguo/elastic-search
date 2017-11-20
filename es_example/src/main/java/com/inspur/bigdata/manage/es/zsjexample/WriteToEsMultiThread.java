@@ -50,7 +50,7 @@ class ProcessHandler implements Runnable {
 					String qxdm = DataGenUtil.generatorqxdmStr();
 					String bdcdyh = DataGenUtil.getBdcdyh(qxdm);
 					// 客体索引
-					bulk.add(new IndexRequest("keti", "keti").source(XContentFactory.jsonBuilder().startObject()
+					bulk.add(new IndexRequest("keti_1y", "keti_1y").source(XContentFactory.jsonBuilder().startObject()
 							.field("bdcdyh", bdcdyh).field("lx", BaseUtil.getScopeInt(1, 20))
 							.field("uuid", BaseUtil.getUUid()).field("qx", qxdm)
 							.field("zl", AreaUtil.getAreaCodeName(qxdm)).field("records", BaseUtil.getScopeInt(0, 1))
@@ -61,7 +61,7 @@ class ProcessHandler implements Runnable {
 					int qlrcount = BaseUtil.getScopeInt(1, 3);
 					for (int a = 0; a < qlrcount; a++) {
 						String qluuid = BaseUtil.getUUid();
-						bulk.add(new IndexRequest("qlr", "qlr").source(XContentFactory.jsonBuilder().startObject()
+						bulk.add(new IndexRequest("qlr_1y", "qlr_1y").source(XContentFactory.jsonBuilder().startObject()
 								.field("bdcdyh", bdcdyh).field("zjh", DataGenUtil.getIdCardNo())
 								.field("uuid", BaseUtil.getUUid()).field("qluuid", qluuid)
 								.field("lx", DataGenUtil.getQlrlx()).field("xm", RandomValue.getChineseName())
@@ -71,7 +71,7 @@ class ProcessHandler implements Runnable {
 								.field("postDate", BaseUtil.getRandomTime("2015-01-01", "2017-12-31")).endObject()));
 
 						// wn.addQlrCount();
-						bulk.add(new IndexRequest("ql", "ql").source(XContentFactory.jsonBuilder().startObject()
+						bulk.add(new IndexRequest("ql_1y", "ql_1y").source(XContentFactory.jsonBuilder().startObject()
 								.field("bdcdyh", bdcdyh).field("uuid", qluuid).field("qllx", DataGenUtil.getQllx())
 								.field("qlxz", DataGenUtil.getQlxz()).field("qx", qxdm)
 								// 随机生成几个汉字，作为单位地址
@@ -101,17 +101,22 @@ public class WriteToEsMultiThread {
 	public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 	// public static String hostname = "192.168.56.119";
 	// public static String hostname = "10.110.18.131";
-	public static String hostname = "10.110.13.174";
+//	public static String hostname = "10.110.13.174";
 	// public static String hostname = "localhost";
 	public static String clustername = "es";
-	public static double count = 10000.0d;
+	public static double count = 100000000.0d;
 	public static ObjectMapper mapper = new ObjectMapper();
 
 	public static TransportClient getClient1withNOxpack() throws UnknownHostException {
 		Settings settings = Settings.builder().put("cluster.name", clustername).put("transport.type", "netty4")
 				.put("http.type", "netty4").build();
 		TransportClient client = new PreBuiltTransportClient(settings);
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(hostname), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
+//		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
 		return client;
 	}
 

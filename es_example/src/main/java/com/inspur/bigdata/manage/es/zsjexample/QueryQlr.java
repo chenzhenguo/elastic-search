@@ -3,16 +3,11 @@ package com.inspur.bigdata.manage.es.zsjexample;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.logging.log4j.core.util.ExecutorServices;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -21,14 +16,11 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filters.Filters;
 import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator;
 import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator.KeyedFilter;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class QueryQlr {
@@ -39,16 +31,16 @@ public class QueryQlr {
 
 		TransportClient client = getClient1withNOxpack();
 
-		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		// getQyrsBYNone(client);
-
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		// getQyrsBYName(client, "东凡茗");
+		// getQyrsBYName(client, "闻珊宁");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
-		// getQyrsBYZjh(client,"431302200301214210");
+		// getQyrsBYZjh(client,"610722198110030371");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
-		getQyrsBYNameAndDw(client, "禄娥晓", "镀肠属欢娥赏导洞檄梧壤兜");
+		//getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
+
+		// 查询场景：查询出权利人前100条记录，条件：无条件;
+		 getQyrsBYNone(client);
 
 		client.close();
 
@@ -84,7 +76,7 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.matchPhraseQuery("xm", nm)).must(QueryBuilders.matchPhraseQuery("dw", dw))
@@ -112,7 +104,7 @@ public class QueryQlr {
 				long threadStart = System.currentTimeMillis();
 				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
 
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
 						.filter(QueryBuilders.termQuery("records", "0"));
@@ -153,7 +145,7 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.matchPhraseQuery("zjh", id)).must(QueryBuilders.termQuery("records", 0));
@@ -180,7 +172,7 @@ public class QueryQlr {
 				long threadStart = System.currentTimeMillis();
 				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
 
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
 						.filter(QueryBuilders.termQuery("records", "0"));
@@ -220,10 +212,10 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.matchPhraseQuery("xm", name)).must(QueryBuilders.termQuery("records", 0));
+				.must(QueryBuilders.matchPhraseQuery("xm", name)).filter(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -235,7 +227,19 @@ public class QueryQlr {
 			zjSets.add(String.valueOf(qlrHits.getHits()[i].getSource().get("zjh")));
 		}
 		long getQlr100End = System.currentTimeMillis();
-		System.out.println("get100Qlr cost :" + (getQlr100End - start));
+		System.out.println("100条权利人耗时:" + (getQlr100End - start));
+
+		// int jhTime = zjSets.size();
+		// KeyedFilter[] fAs = new KeyedFilter[jhTime];
+		//
+		// int j = 0;
+		// for (String zjh : zjSets) {
+		//
+		// fAs[j++] = new FiltersAggregator.KeyedFilter(zjh,
+		// QueryBuilders.termQuery("zjh", zjh));
+		// }
+		//
+		// getJh(client, fAs);
 
 		ExecutorService threadPool = Executors.newFixedThreadPool(100);
 
@@ -247,10 +251,9 @@ public class QueryQlr {
 				long threadStart = System.currentTimeMillis();
 				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
 
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
-						.filter(QueryBuilders.termQuery("records", "0"));
+				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh));
 
 				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
 
@@ -278,6 +281,11 @@ public class QueryQlr {
 
 		}
 
+		// long end = System.currentTimeMillis();
+		//
+		// System.out.println("权利人总条数" + qlrHits.getTotalHits() + ",权利人总耗时：" +
+		// (end - start) + "ms,");
+
 	}
 
 	// 查询场景：查询出权利人前100条记录，条件：无条件
@@ -287,7 +295,7 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("records", 0));
@@ -324,7 +332,7 @@ public class QueryQlr {
 				long threadStart = System.currentTimeMillis();
 				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
 
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 
 				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
 						.filter(QueryBuilders.termQuery("records", "0"));

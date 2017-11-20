@@ -37,16 +37,14 @@ public class QueryKeti {
 
 		TransportClient client = getClient1withNOxpack();
 
-		/******
-		 * 查询出客体前100条记录，条件：坐落+行政区划，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		 */
-		getQlrByZlXzqh(client, "惠州", "441300");
-
-		// /查询场景：查询出客体前100条记录，条件：不动产单元号，根据每条客体记录的不动产单元号获取权利人 毫秒
-		// getQyrsByBdcdyh(client, "511802905851GB05553F441136666");
+		// /查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
+		// getQyrsByBdcdyhOrZl(client, "zl","望江");
 
 		// 查询场景：查询出客体前100条记录，无条件，根据每条客体记录的不动产单元号，获取权利人 毫秒
 		// getQyrsBYNone(client);
+
+		// 查询出客体前100条记录，条件：坐落+行政区划，根据每条客体记录的不动产单元号，获取权利人 毫秒
+		getQlrByZlXzqh(client, "高阳", "130628");
 		client.close();
 
 	}
@@ -83,7 +81,7 @@ public class QueryKeti {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti").setTypes("keti").setSize(100);
+		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti_1y").setTypes("keti_1y").setSize(100);
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("zl", zl))
@@ -108,7 +106,7 @@ public class QueryKeti {
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
 
-		SearchRequestBuilder qlrRb = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrRb = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 		SearchResponse response1 = qlrRb.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
 		long qlrCount = hits1.getTotalHits();
@@ -127,7 +125,7 @@ public class QueryKeti {
 	}
 
 	/****
-	 * 查询场景：查询出客体前100条记录，条件：不动产单元号，根据每条客体记录的不动产单元号获取权利人 毫秒
+	 * 查询场景：查询出客体前100条记录，条件：不动产单元号(或坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
 	 * 
 	 * @param client
 	 * @param index
@@ -135,19 +133,20 @@ public class QueryKeti {
 	 * @param size
 	 * @throws UnknownHostException
 	 */
-	public static void getQyrsByBdcdyh(TransportClient client, String bdcdyh) throws UnknownHostException {
+	public static void getQyrsByBdcdyhOrZl(TransportClient client, String key, String paramV)
+			throws UnknownHostException {
 
 		long start = System.currentTimeMillis();
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti").setTypes("keti").setSize(100);
+		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti_1y").setTypes("keti_1y").setSize(100);
 
 		// SearchResponse response =
 		// client.prepareSearch(index).setTypes(type).setSize(size).execute().actionGet();
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("bdcdyh", bdcdyh));
+				.must(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery(key, paramV));
 
 		SearchResponse ketiResponse = ketiSearchRB.setQuery(ketiBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -168,7 +167,7 @@ public class QueryKeti {
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
 
-		SearchRequestBuilder qlrRb = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrRb = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 		SearchResponse response1 = qlrRb.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
 		long qlrCount = hits1.getTotalHits();
@@ -192,13 +191,13 @@ public class QueryKeti {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti").setTypes("keti").setSize(100);
+		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti_1y").setTypes("keti_1y").setSize(100);
 
 		// SearchResponse response =
 		// client.prepareSearch(index).setTypes(type).setSize(size).execute().actionGet();
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.termQuery("records", "0"));
+				.must(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse ketiResponse = ketiSearchRB.setQuery(ketiBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -217,9 +216,9 @@ public class QueryKeti {
 		}
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.filter(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
+				.filter(QueryBuilders.termQuery("records", 0)).must(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
 
-		SearchRequestBuilder qlrRb = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
+		SearchRequestBuilder qlrRb = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
 		SearchResponse response1 = qlrRb.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
 		long qlrCount = hits1.getTotalHits();

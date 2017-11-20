@@ -92,7 +92,8 @@ public class QueryBack {
 
 		// 查询权利人通过证件号
 		// chaXunQlrByConditionByMust(client,"qlr","qlr","zjh","230600198010015006");
-		//chaXunQlrByConditionByFilter(client, "qlr", "qlr", "zjh", "230600198010015006");
+		// chaXunQlrByConditionByFilter(client, "qlr", "qlr", "zjh",
+		// "230600198010015006");
 
 		// 查询权利人不动产单元号
 		// chaXunQlrByConditionByFilter(client, "qlr", "qlr", "bdcdyh",
@@ -100,7 +101,7 @@ public class QueryBack {
 		// chaXunQlrByConditionByMust(client,"qlr","qlr","bdcdyh","330400934373GB28301F427478609");
 
 		// 根据不动产单元号 查keti信息
-		//chaXunKetiByBdcdyh(client, "keti", "keti", "");
+		// chaXunKetiByBdcdyh(client, "keti", "keti", "");
 
 		// 先插客体100条记录，然后找出不动产单元号，然后根据权利人相关信息
 		// getQyrsByBdcdyhList(client, "keti3", "keti3", 100);
@@ -118,7 +119,7 @@ public class QueryBack {
 		// queryQlrBdcNum(client, "qlr", "qlr", "zjh", "230600198010015006");
 
 		// 统计场景1
-		// tjBdcNumByCondition(client);
+		tjBdcNumByCondition(client);
 
 		// getQyrsByBdcdyh(client,"530122207927GB92318F487692347",100);
 
@@ -195,7 +196,7 @@ public class QueryBack {
 	private static void tjBdcNumByCondition(TransportClient client) {
 
 		long start = System.currentTimeMillis();
-		SearchRequestBuilder srb = client.prepareSearch("qlr").setTypes("qlr");
+		SearchRequestBuilder srb = client.prepareSearch("qlr_1y").setTypes("qlr_1y");
 		TermsAggregationBuilder gradeTermsBuilder = AggregationBuilders.terms("qxtj").field("lx").size(100);
 		// ValueCountAggregationBuilder gradeTermsBuilder =
 		// AggregationBuilders.count("gradeAgg").field("qx");
