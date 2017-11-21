@@ -19,20 +19,52 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filters.Filters;
-import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator;
 import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator.KeyedFilter;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+
+/*****
+ * 短语匹配：
+ *  "match": { "title": { "query": "quick brown fox", "type": "phrase" } }
+ * 
+ *  GET /my_index/my_type/_search
+{
+    "query": {
+        "match_phrase": {
+            "title": "quick brown fox"
+        }
+    }
+}
+ * 
+ * {match_phrase，match_phrase 查询首先将查询字符串解析成一个词项列表，然后对这些词项进行搜索，但只保留那些包含 全部 搜索词项，且
+ * 位置 与搜索词项相同的文档 一个被认定为和短语 quick brown fox 匹配的文档，必须满足以下这些要求：
+ * 
+ * quick 、 brown 和 fox 需要全部出现在域中。 brown 的位置应该比 quick 的位置大 1 。 fox 的位置应该比 quick
+ * 的位置大 2 。 如果以上任何一个选项不成立，则该文档不能认定为匹配。 } match_phrase 查询是利用一种低级别的 span 查询族（query
+ * family）去做词语位置敏感的匹配。
+ * 
+ * 
+ * 
+ * @author wangjie2017
+ *
+ */
 
 public class QueryQlr {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static String clustername = "es";
+	private static String indexname = "qlr1";
+	private static String typename = "qlr1";
+
+	/*****
+	 * 0：虚拟机 1：实体机
+	 */
+	private static String linuxType = "0";
 
 	public static void main(String[] args) throws UnknownHostException, InterruptedException {
 
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		// getQyrsBYName(client, "闻珊宁");
+		 getQyrsBYName(client, "宋昭");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
 		// getQyrsBYZjh(client,"610722198110030371");
 
@@ -40,7 +72,7 @@ public class QueryQlr {
 		//getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		 getQyrsBYNone(client);
+		//getQyrsBYNone(client);
 
 		client.close();
 
@@ -59,12 +91,18 @@ public class QueryQlr {
 		// InetSocketTransportAddress(InetAddress.getByName("host1"), 9300))
 		// .addTransportAddress(new
 		// InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
+		if (linuxType.equals("1")) {
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
+		} else {
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.130"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.131"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.132"), 9300));
+		}
 
 		return client;
 	}
@@ -212,10 +250,10 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.matchPhraseQuery("xm", name)).filter(QueryBuilders.termQuery("records", 0));
+				.filter(QueryBuilders.matchPhraseQuery("xm", name)).filter(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -295,14 +333,17 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
+		
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.termQuery("records", 0));
+				.filter(QueryBuilders.matchPhraseQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
 		SearchHits qlrHits = qlrResponse.getHits();
+		
+		
 
 		Set<String> zjSets = new HashSet<String>(100);
 
@@ -332,10 +373,13 @@ public class QueryQlr {
 				long threadStart = System.currentTimeMillis();
 				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
 
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+				SearchRequestBuilder qlrTj = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
-						.filter(QueryBuilders.termQuery("records", "0"));
+				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh)
+				/*
+				 * .operator(org.elasticsearch.index.query.Operator.AND)仅仅对match
+				 * query起作用
+				 */).filter(QueryBuilders.termQuery("records", 0));
 
 				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
 
