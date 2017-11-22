@@ -57,7 +57,7 @@ class ProcessHandler implements Runnable {
 
 		for (int i = 0; i < total; i++) {
 
-			// threadPool.submit(() -> {
+//			 threadPool.submit(() -> {
 
 			try {
 				String qxdm = DataGenUtil.generatorqxdmStr();
@@ -99,7 +99,7 @@ class ProcessHandler implements Runnable {
 				e.printStackTrace();
 			}
 
-			// });
+//			});
 
 		}
 

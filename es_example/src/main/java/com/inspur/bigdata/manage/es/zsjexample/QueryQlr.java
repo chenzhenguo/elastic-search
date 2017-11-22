@@ -48,6 +48,16 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
  *
  */
 
+/******
+ * 验证1：filter 确实比 must 和should快
+ * 
+ * 验证2：短语匹配和普通的term查询 不太明显
+ * 
+ * 
+ * @author wangjie2017
+ *
+ */
+
 public class QueryQlr {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static String clustername = "es";
@@ -64,15 +74,15 @@ public class QueryQlr {
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		 getQyrsBYName(client, "宋昭");
+		getQyrsBYName(client, "宰勤");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
 		// getQyrsBYZjh(client,"610722198110030371");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
-		//getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
+		// getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		//getQyrsBYNone(client);
+		// getQyrsBYNone(client);
 
 		client.close();
 
@@ -253,7 +263,7 @@ public class QueryQlr {
 		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.filter(QueryBuilders.matchPhraseQuery("xm", name)).filter(QueryBuilders.termQuery("records", 0));
+				.filter(QueryBuilders.termQuery("xm", name)).filter(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -289,19 +299,21 @@ public class QueryQlr {
 				long threadStart = System.currentTimeMillis();
 				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
 
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+				SearchRequestBuilder qlrTj = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh));
+				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh))
+						.must(QueryBuilders.termQuery("xm", name));
 
 				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
 
 				SearchHits qlrTjHits = qlrTjResponse.getHits();
 
-				System.out.println("zjh:" + zjh + ",total:" + qlrTjHits.getTotalHits());
+				System.out.println("zjh:" + zjh + ",total:" + qlrTjHits.getTotalHits() + ",xm:"
+						+ qlrTjHits.getHits()[0].getSource().get("xm"));
 
 				long tEnd = System.currentTimeMillis();
-				System.out.println(
-						Thread.currentThread().getName() + "zjh:" + zjh + "cost time :" + (tEnd - threadStart));
+				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + " ,xm:"
+						+ qlrTjHits.getHits()[0].getSource().get("xm") + "cost time :" + (tEnd - threadStart));
 
 			});
 
@@ -335,15 +347,12 @@ public class QueryQlr {
 
 		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-		
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.matchPhraseQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
 		SearchHits qlrHits = qlrResponse.getHits();
-		
-		
 
 		Set<String> zjSets = new HashSet<String>(100);
 
