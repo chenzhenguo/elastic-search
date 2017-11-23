@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -29,19 +33,21 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * elasticsearch操作工具类
  * 
  */
+
 public class ESUtils {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
-		createIndex(getClient("es", "10.110.13.176"), "ql3", "ql3", 5, 3);
-		//writeDocument(getClient("es", "10.110.13.176"), "keti3", "keti3");
+		// createIndex(getClient("es", "10.110.13.176"), "ql3", "ql3", 5, 3);
+		writeDocument(getClient("es", "10.110.18.130"), "study", "study");
 	}
 
 	public static void createIndex(TransportClient client, String indexName, String type, int shareds, int replices)
@@ -135,41 +141,22 @@ public class ESUtils {
 	 * @throws IOException
 	 */
 	public static void writeDocument(TransportClient client, String indexName, String typeName) throws IOException {
-		XContentBuilder jsonBuild1 = XContentFactory.jsonBuilder();
-		// XContentBuilder jsonBuild2 = XContentFactory.jsonBuilder();
-		// XContentBuilder jsonBuild3 = XContentFactory.jsonBuilder();
-		// XContentBuilder jsonBuild4 = XContentFactory.jsonBuilder();
-		// XContentBuilder jsonBuild5 = XContentFactory.jsonBuilder();
-		ObjectMapper mapper = new ObjectMapper();
-		List<String> jsonData = new ArrayList<String>();
-		String data1 = jsonBuild1.startObject().field("lx", "9").field("uuid","ddddd").field("bdcdyh", "530400016859GB96049F773277343")
-				.field("qx", "150722").field("zl","市中").endObject().string();
-		// String data2 = jsonBuild2.startObject().field("id",
-		// "2").field("title", "Java中泛型的介绍与简单使用")
-		// .field("date", "2016-06-19").field("message",
-		// "学习目标掌握泛型的产生意义").endObject().string();
-		//
-		// String data3 = jsonBuild3.startObject().field("id",
-		// "3").field("title", "SQL基本操作").field("date", "2016-06-19")
-		// .field("message", "基本操作：CRUD").endObject().string();
-		//
-		// String data4 = jsonBuild4.startObject().field("id",
-		// "4").field("title", "Hibernate框架基础")
-		// .field("date", "2016-06-19").field("message",
-		// "Hibernate框架基础").endObject().string();
-		// String data5 = jsonBuild5.startObject().field("id",
-		// "5").field("title", "Shell基本知识").field("date", "2016-06-19")
-		// .field("message", "Shell是什么").endObject().string();
-		jsonData.add(data1);
-		// jsonData.add(data2);
-		// jsonData.add(data3);
-		// jsonData.add(data4);
-		// jsonData.add(data5);
-		for (int i = 0; i < jsonData.size(); i++) {
-			IndexResponse response = client.prepareIndex(indexName, typeName).setId(String.valueOf(i + 1))
-					.setSource(jsonData.get(i), XContentType.JSON).get();
-		}
-		System.out.println("写入成功");
+
+		Map<String, String> parm = new HashMap<String, String>(1);
+		parm.put("first", "wang");
+		parm.put("last", "jie");
+		Student a = new Student(UUID.randomUUID().toString(), "02", parm);
+
+		//Student b = new Student(UUID.randomUUID().toString(), "02", parm);
+
+		List<Student> students = Arrays.asList(a);
+		String jsondata=JSON.toJSONString(students);
+		jsondata=jsondata.replace("[", "").replace("]", "");
+
+		IndexResponse response = client.prepareIndex(indexName, typeName).setId("1")
+				.setSource(jsondata, XContentType.JSON).get();
+
+		System.out.println("写入成功" + ";fragment:" + response.isFragment());
 	}
 
 	/**
@@ -200,4 +187,41 @@ public class ESUtils {
 			throws UnknownHostException {
 		DeleteResponse response = client.prepareDelete(indexName, typeName, documentID).get();
 	}
+}
+
+class Student {
+	private String bdcdyh;
+	private String lx;
+	private Map<String, String> name;
+
+	Student(String bdcdyh, String lx, Map<String, String> name) {
+		this.bdcdyh = bdcdyh;
+		this.lx = lx;
+		this.name = name;
+	}
+
+	public String getBdcdyh() {
+		return bdcdyh;
+	}
+
+	public void setBdcdyh(String bdcdyh) {
+		this.bdcdyh = bdcdyh;
+	}
+
+	public String getLx() {
+		return lx;
+	}
+
+	public void setLx(String lx) {
+		this.lx = lx;
+	}
+
+	public Map<String, String> getName() {
+		return name;
+	}
+
+	public void setName(Map<String, String> name) {
+		this.name = name;
+	}
+
 }

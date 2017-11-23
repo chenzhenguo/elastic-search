@@ -74,7 +74,7 @@ public class QueryQlr {
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		getQyrsBYName(client, "宰勤");
+		 getQyrsBYName(client, "宰勤");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
 		// getQyrsBYZjh(client,"610722198110030371");
 
@@ -82,7 +82,7 @@ public class QueryQlr {
 		// getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		// getQyrsBYNone(client);
+		//getQyrsBYNone(client);
 
 		client.close();
 
@@ -94,7 +94,8 @@ public class QueryQlr {
 	 * @return TransportClient
 	 * @throws UnknownHostException
 	 */
-	public static TransportClient getClient1withNOxpack() throws UnknownHostException {
+	public static TransportClient 
+	getClient1withNOxpack() throws UnknownHostException {
 		Settings settings = Settings.builder().put("cluster.name", clustername).build();
 		TransportClient client = new PreBuiltTransportClient(settings);
 		// client.addTransportAddress(new
