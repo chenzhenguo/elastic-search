@@ -1,16 +1,11 @@
-#查看 各个索引数据情况
 GET _cat/indices
 
-#查看节点信息
 GET /_nodes
 
-#查看各个分片是否启动
 GET  /_cat/shards
 
-#查看索引的总数量
 GET /keti/_count
 
-#指定索引的某字段查看
 GET keti/_search
 {
    "_source": {
@@ -19,7 +14,6 @@ GET keti/_search
    }
 }
 
-#模糊匹配 zjh 是420117199206082091 的文档
  GET /qlr/_search
 {
        "query": {
@@ -30,9 +24,105 @@ GET keti/_search
 }
 
 
- GET /qlr/_search
+POST /_aliases
+{  
 
-#精确匹配不分词
+    "actions": [  
+
+        { "add": {  
+
+            "alias": "study_alis",  
+
+            "index": "study1"  
+
+        }}  
+
+    ]  
+
+}
+
+GET /study_alis/_mapping
+
+POST /_aliases
+{  
+
+    "actions": [  
+
+        { "remove": {  
+
+            "alias": "study_alis",  
+
+            "index": "study"  
+
+        }},  
+
+        { "add": {  
+
+            "alias": "study_alis",  
+
+            "index": "study1"  
+
+        }}  
+
+    ]  
+
+}
+
+PUT study1
+{
+  "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+  "mappings": 
+  {
+    "study1": {
+        "properties": {
+          "name":{
+            "properties":
+            {
+              "first":{"type":"text"},
+              "last":{"type":"text"}
+            }
+          },
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "lx": {
+            "type": "keyword"
+            },
+            "age":{
+              "type":"integer"
+            }
+          }
+      }
+  }
+}
+DELETE  study1
+
+PUT /study1/_mapping/study1
+{
+  "properties": {
+    "address": {
+      "type": "keyword"
+    }
+  }
+}
+
+GET /qlr/_search
+
+PUT /_all/_settings?preserve_existing=true
+{
+
+  "index.cache.field.expire" : "10m",
+
+  "index.cache.field.max_size" : "50000",
+
+  "index.cache.field.type" : "soft"
+
+}
+
  GET /qlr/_search
 {
        "query":{
@@ -45,8 +135,27 @@ GET keti/_search
 }
 }
 
-#查询索引 指定返回条数，默认分会10条记录
-GET qlr/_search
+get keti/_search
+
+GET /qlr/_count
+GET ql/count
+
+GET ql_1y/_mapping
+
+GET qlr1/_mapping
+
+GET keti_1y/_mapping
+
+GET keti_1y/_search
+{
+  "size": 100, 
+  "_source": {
+       "include": ["bdcdyh","qx","zl"],
+     "excludes" : ["path3.*"]
+   }
+}
+
+GET qlr1/_search
 {
   "size": 100, 
   "_source": {
@@ -57,21 +166,7 @@ GET qlr/_search
  
 }
 
-get keti/_search
-
-GET /qlr/_count
-GET ql/count
-
-
-#获取索引映射
-GET ql3/_mapping
-
-GET qlr3/_mapping
-
-
-
-
-
+get ql1/_search
 
 
 
@@ -89,7 +184,6 @@ GET ql/_search
 
 GET qlr/_search
 
-#布尔查询 模糊匹配
 GET qlr/_search
 {
   "query":{
@@ -115,8 +209,67 @@ GET keti/_search
  
 }DELETE  keti3
 
-#创建索引，并且添加映射和setting信息
-PUT  keti3
+
+GET _analyze
+{
+  "analyzer":"ik_max_word",
+  "text":"历下区"
+}
+GET _analyze
+{
+  "analyzer": "analysis-ik",
+  "text":"历下区"
+}
+
+get keti1/_search
+{
+  "size":100
+}
+
+
+get qlr1/_search
+{
+  "size":100
+}
+
+DELETE  study
+
+GET /study/_search
+
+PUT study1
+{
+  "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+  "mappings": 
+  {
+    "study": {
+        "properties": {
+          "name":{
+            "properties":
+            {
+              "first":{"type":"text"},
+              "last":{"type":"text"}
+            }
+          },
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "lx": {
+            "type": "keyword"
+            },
+            "age":{
+              "type":"integer"
+            }
+          }
+      }
+  }
+}
+
+DELETE  keti1
+PUT  keti1
 {
     "settings" : {
         "number_of_shards":3,
@@ -124,7 +277,7 @@ PUT  keti3
         "refresh_interval":"30s"
      },
       "mappings": {
-      "keti3": {
+      "keti1": {
         "properties": {
           "bdcdyh": {
             "type": "keyword"
@@ -146,7 +299,7 @@ PUT  keti3
           },
           "zl": {
             "type": "text",
-            "analyzer": "ik_max_word"
+             "analyzer": "ik_max_word"
           }
         }
       }
@@ -154,9 +307,9 @@ PUT  keti3
 }
 
 
-DELETE  ql3
+DELETE  ql1
 
-PUT ql3
+PUT ql1
 {
    "settings" : {
         "number_of_shards":3,
@@ -164,7 +317,7 @@ PUT ql3
         "refresh_interval":"30s"
      },
       "mappings": {
-      "ql": {
+      "ql1": {
         "properties": {
           "bdcdyh": {
             "type": "keyword"
@@ -194,9 +347,11 @@ PUT ql3
 }
 
 
-DELETE  qlr3
+GET qlr1/_mapping 
 
-PUT  qlr3
+DELETE  qlr1
+
+PUT  qlr1
 {
         "settings" : {
         "number_of_shards":3,
@@ -204,14 +359,13 @@ PUT  qlr3
         "refresh_interval":"30s"
      },
       "mappings": {
-      "qlr": {
+      "qlr1": {
         "properties": {
           "bdcdyh": {
             "type": "keyword"
           },
           "dw": {
-            "type": "text",
-            "analyzer": "ik_max_word"
+            "type": "text"
           },
           "lx": {
             "type": "keyword"
@@ -230,8 +384,7 @@ PUT  qlr3
             "type": "keyword"
           },
           "xm": {
-            "type": "text",
-            "analyzer": "ik_max_word"
+            "type": "keyword"
           },
           "zjh": {
             "type": "keyword"
