@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -19,6 +20,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filters.Filters;
+import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator;
 import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator.KeyedFilter;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
@@ -63,6 +65,7 @@ public class QueryQlr {
 	public static String clustername = "es";
 	private static String indexname = "qlr1";
 	private static String typename = "qlr1";
+	private static int aggType = 0;// 0:官方推荐 1：多线程
 
 	/*****
 	 * 0：虚拟机 1：实体机
@@ -74,15 +77,15 @@ public class QueryQlr {
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		 getQyrsBYName(client, "宰勤");
+		// getQyrsBYName(client, "宰勤");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
-		// getQyrsBYZjh(client,"610722198110030371");
+		//getQyrsBYZjh(client, "510301198702256481");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
 		// getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		//getQyrsBYNone(client);
+		 getQyrsBYNone(client);
 
 		client.close();
 
@@ -94,8 +97,7 @@ public class QueryQlr {
 	 * @return TransportClient
 	 * @throws UnknownHostException
 	 */
-	public static TransportClient 
-	getClient1withNOxpack() throws UnknownHostException {
+	public static TransportClient getClient1withNOxpack() throws UnknownHostException {
 		Settings settings = Settings.builder().put("cluster.name", clustername).build();
 		TransportClient client = new PreBuiltTransportClient(settings);
 		// client.addTransportAddress(new
@@ -143,45 +145,12 @@ public class QueryQlr {
 		long getQlr100End = System.currentTimeMillis();
 		System.out.println("get100Qlr cost :" + (getQlr100End - start));
 
-		ExecutorService threadPool = Executors.newFixedThreadPool(100);
-
-		System.out.println("zjhm nums is :" + qlrHits.getTotalHits());
-		for (String zjh : zjSets) {
-
-			threadPool.submit(() -> {
-
-				long threadStart = System.currentTimeMillis();
-				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
-
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
-
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
-						.filter(QueryBuilders.termQuery("records", "0"));
-
-				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
-
-				SearchHits qlrTjHits = qlrTjResponse.getHits();
-
-				System.out.println("zjh:" + zjh + ",total:" + qlrTjHits.getTotalHits());
-
-				long tEnd = System.currentTimeMillis();
-				System.out.println(
-						Thread.currentThread().getName() + "zjh:" + zjh + "cost time :" + (tEnd - threadStart));
-
-			});
-
-		}
-
-		threadPool.shutdown();
-
-		while (true) {
-			if (threadPool.isTerminated()) {
-				long end = System.currentTimeMillis();
-
-				System.out.println("权利人总条数" + qlrHits.getTotalHits() + ",权利人总耗时：" + (end - start) + "ms,");
-				break;
-			}
-
+		if (aggType == 0) {
+			// 官方推荐的聚合方式
+			tjByAggs(client, zjSets);
+		} else {
+			// 通过多线程方式提升统计速度
+			tjByMutiThread(client, "", start, qlrHits, zjSets);
 		}
 		client.close();
 
@@ -194,7 +163,7 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.matchPhraseQuery("zjh", id)).must(QueryBuilders.termQuery("records", 0));
@@ -211,47 +180,14 @@ public class QueryQlr {
 		long getQlr100End = System.currentTimeMillis();
 		System.out.println("get100Qlr cost :" + (getQlr100End - start));
 
-		ExecutorService threadPool = Executors.newFixedThreadPool(100);
-
-		System.out.println("zjhm nums is :" + qlrHits.getTotalHits());
-		for (String zjh : zjSets) {
-
-			threadPool.submit(() -> {
-
-				long threadStart = System.currentTimeMillis();
-				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
-
-				SearchRequestBuilder qlrTj = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
-
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh))
-						.filter(QueryBuilders.termQuery("records", "0"));
-
-				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
-
-				SearchHits qlrTjHits = qlrTjResponse.getHits();
-
-				System.out.println("zjh:" + zjh + ",total:" + qlrTjHits.getTotalHits());
-
-				long tEnd = System.currentTimeMillis();
-				System.out.println(
-						Thread.currentThread().getName() + "zjh:" + zjh + "cost time :" + (tEnd - threadStart));
-
-			});
-
+		if (aggType == 0) {
+			// 官方推荐的聚合方式
+			tjByAggs(client, zjSets);
+		} else {
+			// 通过多线程方式提升统计速度
+			tjByMutiThread(client, "", start, qlrHits, zjSets);
 		}
-
-		threadPool.shutdown();
-
-		while (true) {
-			if (threadPool.isTerminated()) {
-				long end = System.currentTimeMillis();
-
-				System.out.println("权利人总条数" + qlrHits.getTotalHits() + ",权利人总耗时：" + (end - start) + "ms,");
-				break;
-			}
-
-		}
-
+		client.close();
 	}
 
 	// 查询场景：查询权利人，条件：权利人，查询权利人信息
@@ -278,18 +214,68 @@ public class QueryQlr {
 		long getQlr100End = System.currentTimeMillis();
 		System.out.println("100条权利人耗时:" + (getQlr100End - start));
 
-		// int jhTime = zjSets.size();
-		// KeyedFilter[] fAs = new KeyedFilter[jhTime];
-		//
-		// int j = 0;
-		// for (String zjh : zjSets) {
-		//
-		// fAs[j++] = new FiltersAggregator.KeyedFilter(zjh,
-		// QueryBuilders.termQuery("zjh", zjh));
-		// }
-		//
-		// getJh(client, fAs);
+		if (aggType == 0) {
+			// 官方推荐的聚合方式
+			tjByAggs(client, zjSets);
+		} else {
+			// 通过多线程方式提升统计速度
+			tjByMutiThread(client, name, start, qlrHits, zjSets);
+		}
 
+	}
+
+	/****
+	 * 官方推荐的聚合方式
+	 * 
+	 * @param client
+	 * @param zjSets
+	 * @throws UnknownHostException
+	 */
+	private static void tjByAggs(TransportClient client, Set<String> zjSets) throws UnknownHostException {
+		int jhTime = zjSets.size();
+		KeyedFilter[] fAs = new KeyedFilter[jhTime];
+
+		int j = 0;
+		for (String zjh : zjSets) {
+
+			fAs[j++] = new FiltersAggregator.KeyedFilter(zjh, QueryBuilders.termQuery("zjh", zjh));
+		}
+
+		long start = System.currentTimeMillis();
+
+		AggregationBuilder gradeTermsBuilder = AggregationBuilders.filters("qlrtj", fAs);
+
+		SearchRequestBuilder srb = client.prepareSearch(indexname).setTypes(typename).setSize(100);
+		srb.addAggregation(gradeTermsBuilder);
+
+		SearchResponse sr = srb.execute().actionGet();
+
+		Filters agg = sr.getAggregations().get("qlrtj");
+
+		long totalAll = 0;
+		for (Filters.Bucket entry : agg.getBuckets()) {
+			String key = entry.getKeyAsString();
+			long docCount = entry.getDocCount();
+			System.out.println("zjh" + key + ",count:" + docCount);
+			totalAll += docCount;
+		}
+
+		long end = System.currentTimeMillis();
+		System.out.println("聚合总共条数：" + totalAll + ",聚合总耗时：" + (end - start) + "ms");
+
+	}
+
+	/****
+	 * 通过多线程方式提升统计速度
+	 * 
+	 * @param client
+	 * @param name
+	 * @param start
+	 * @param qlrHits
+	 * @param zjSets
+	 */
+	private static void tjByMutiThread(TransportClient client, String name, long start, SearchHits qlrHits,
+			Set<String> zjSets) {
 		ExecutorService threadPool = Executors.newFixedThreadPool(100);
 
 		System.out.println("zjhm nums is :" + qlrHits.getTotalHits());
@@ -302,8 +288,13 @@ public class QueryQlr {
 
 				SearchRequestBuilder qlrTj = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh))
-						.must(QueryBuilders.termQuery("xm", name));
+				BoolQueryBuilder qlrTjBool = null;
+				if (StringUtils.isNotBlank(name)) {
+					QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh))
+							.must(QueryBuilders.termQuery("xm", name));
+				} else {
+					QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh));
+				}
 
 				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
 
@@ -331,12 +322,6 @@ public class QueryQlr {
 			}
 
 		}
-
-		// long end = System.currentTimeMillis();
-		//
-		// System.out.println("权利人总条数" + qlrHits.getTotalHits() + ",权利人总耗时：" +
-		// (end - start) + "ms,");
-
 	}
 
 	// 查询场景：查询出权利人前100条记录，条件：无条件
@@ -348,10 +333,10 @@ public class QueryQlr {
 
 		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
+		BoolQueryBuilder qlrBoolQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.matchPhraseQuery("records", 0));
 
-		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
+		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryBuilder1).execute().actionGet();
 
 		SearchHits qlrHits = qlrResponse.getHits();
 
@@ -362,86 +347,14 @@ public class QueryQlr {
 		}
 		long getQlr100End = System.currentTimeMillis();
 		System.out.println("get100Qlr cost :" + (getQlr100End - start));
-		// int jhTime = zjSets.size();
-		// KeyedFilter[] fAs = new KeyedFilter[jhTime];
-		//
-		// int j = 0;
-		// for (String zjh : zjSets) {
-		//
-		// fAs[j++] = new FiltersAggregator.KeyedFilter(zjh,
-		// QueryBuilders.termQuery("zjh", zjh));
-		// }
 
-		// getJh(client, fAs);
-
-		ExecutorService threadPool = Executors.newFixedThreadPool(100);
-
-		for (String zjh : zjSets) {
-
-			threadPool.submit(() -> {
-
-				long threadStart = System.currentTimeMillis();
-				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
-
-				SearchRequestBuilder qlrTj = client.prepareSearch(indexname).setTypes(typename).setSize(100);
-
-				BoolQueryBuilder qlrTjBool = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("zjh", zjh)
-				/*
-				 * .operator(org.elasticsearch.index.query.Operator.AND)仅仅对match
-				 * query起作用
-				 */).filter(QueryBuilders.termQuery("records", 0));
-
-				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
-
-				SearchHits qlrTjHits = qlrTjResponse.getHits();
-
-				System.out.println("zjh:" + zjh + ",total:" + qlrTjHits.getTotalHits());
-
-				long tEnd = System.currentTimeMillis();
-				System.out.println(
-						Thread.currentThread().getName() + "zjh:" + zjh + "cost time :" + (tEnd - threadStart));
-
-			});
-
+		if (aggType == 0) {
+			// 官方推荐的聚合方式
+			tjByAggs(client, zjSets);
+		} else {
+			// 通过多线程方式提升统计速度
+			tjByMutiThread(client, "", start, qlrHits, zjSets);
 		}
-
-		threadPool.shutdown();
-
-		while (true) {
-			if (threadPool.isTerminated()) {
-				long end = System.currentTimeMillis();
-
-				System.out.println("权利人总条数" + qlrHits.getTotalHits() + ",权利人总耗时：" + (end - start) + "ms,");
-				break;
-			}
-
-		}
-
-	}
-
-	public static void getJh(TransportClient client, KeyedFilter[] kfs) throws UnknownHostException {
-
-		long start = System.currentTimeMillis();
-
-		AggregationBuilder gradeTermsBuilder = AggregationBuilders.filters("qlrtj", kfs);
-
-		SearchRequestBuilder srb = client.prepareSearch("qlr").setTypes("qlr").setSize(100);
-		srb.addAggregation(gradeTermsBuilder);
-
-		SearchResponse sr = srb.execute().actionGet();
-
-		Filters agg = sr.getAggregations().get("qlrtj");
-
-		long totalAll = 0;
-		for (Filters.Bucket entry : agg.getBuckets()) {
-			String key = entry.getKeyAsString();
-			long docCount = entry.getDocCount();
-			System.out.println("zjh" + key + ",count:" + docCount);
-			totalAll += docCount;
-		}
-
-		long end = System.currentTimeMillis();
-		System.out.println("聚合总共条数：" + totalAll + ",聚合总耗时：" + (end - start) + "ms");
 
 	}
 
