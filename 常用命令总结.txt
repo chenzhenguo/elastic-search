@@ -1,0 +1,17 @@
+查看hdfs 路径path下各个文件的大小
+
+hadoop fs -du -h /apps/hive/warehouse/
+
+查看端口号
+netstat -anp|grep 8080
+
+查看剩余内存
+free -g
+查看/跟路径下面 剩余物理磁盘容量
+df -h /
+
+将/data1/esdata目录的所有者归属为es组es用户
+chown -R es:es /data1/esdata/ 
+
+分配最大权限
+chmod -R 777 /data1
