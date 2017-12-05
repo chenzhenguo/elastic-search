@@ -49,7 +49,7 @@ public class UpdateRecordRunnerql extends Thread {
 //        }
         System.out.println(key + "开始" + sdf.format(new Date()));
         long a1 = Calendar.getInstance().getTimeInMillis();
-        SearchRequestBuilder responsebuilder = client.prepareSearch("ql_1y").setTypes("ql_1y");
+        SearchRequestBuilder responsebuilder = client.prepareSearch("ql10").setTypes("ql10");
         BoolQueryBuilder boolQueryQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("records", 0))
                 .filter(QueryBuilders.prefixQuery("qx", key));
         TermsAggregationBuilder gradeTermsBuilder = AggregationBuilders.terms("qllxtj").field("qllx").size(30);

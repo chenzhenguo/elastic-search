@@ -49,7 +49,7 @@ public class UpdateRecordRunnerKeti extends Thread {
 //        }
         System.out.println(key + "开始" + sdf.format(new Date()));
         long a1 = Calendar.getInstance().getTimeInMillis();
-        SearchRequestBuilder responsebuilder = client.prepareSearch("keti_1y").setTypes("keti_1y");
+        SearchRequestBuilder responsebuilder = client.prepareSearch("keti10").setTypes("keti10");
         BoolQueryBuilder boolQueryQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("records", 0))
                 .filter(QueryBuilders.prefixQuery("qx", key));
         TermsAggregationBuilder gradeTermsBuilder = AggregationBuilders.terms("qllxtj").field("lx").size(30);

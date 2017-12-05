@@ -29,6 +29,24 @@ import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
+enum Config {
+	INDEX_KETI("keti10"), INDEX_QLR("qlr10"), INDEX_QL("QL10"), TYPE_KETI("keti10"), TYPE_QLR("qlr10"), TYPE_QL("QL10");
+	private String content;
+
+	Config(String content) {
+		this.content = content;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+}
+
 public class QueryKeti {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static String clustername = "es";
@@ -36,15 +54,16 @@ public class QueryKeti {
 	public static void main(String[] args) throws UnknownHostException, InterruptedException {
 
 		TransportClient client = getClient1withNOxpack();
-
-		// /查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
-		// getQyrsByBdcdyhOrZl(client, "zl","望江");
-
 		// 查询场景：查询出客体前100条记录，无条件，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		// getQyrsBYNone(client);
+		 getQyrsBYNone(client);
+
+		// 查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
+		// getQyrsByBdcdyhOrZl(client, "zl","涿州");
+		// getQyrsByBdcdyhOrZl(client,
+		// "bdcdyh","210500588529GB97927F654278671");
 
 		// 查询出客体前100条记录，条件：坐落+行政区划，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		getQlrByZlXzqh(client, "高阳", "130628");
+		//getQlrByZlXzqh(client, "涞源", "130630");
 		client.close();
 
 	}
@@ -62,12 +81,9 @@ public class QueryKeti {
 		// InetSocketTransportAddress(InetAddress.getByName("host1"), 9300))
 		// .addTransportAddress(new
 		// InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.7"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.8"), 9300));
 
 		return client;
 	}
@@ -81,7 +97,8 @@ public class QueryKeti {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti_1y").setTypes("keti_1y").setSize(100);
+		SearchRequestBuilder ketiSearchRB = client.prepareSearch(Config.INDEX_KETI.getContent())
+				.setTypes(Config.TYPE_KETI.getContent()).setSize(100);
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("zl", zl))
@@ -106,7 +123,8 @@ public class QueryKeti {
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
 
-		SearchRequestBuilder qlrRb = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrRb = client.prepareSearch(Config.INDEX_QLR.getContent())
+				.setTypes(Config.TYPE_QLR.getContent()).setSize(100);
 		SearchResponse response1 = qlrRb.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
 		long qlrCount = hits1.getTotalHits();
@@ -140,7 +158,8 @@ public class QueryKeti {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti_1y").setTypes("keti_1y").setSize(100);
+		SearchRequestBuilder ketiSearchRB = client.prepareSearch(Config.INDEX_KETI.getContent())
+				.setTypes(Config.TYPE_KETI.getContent()).setSize(100);
 
 		// SearchResponse response =
 		// client.prepareSearch(index).setTypes(type).setSize(size).execute().actionGet();
@@ -167,7 +186,8 @@ public class QueryKeti {
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.termQuery("records", "0")).filter(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
 
-		SearchRequestBuilder qlrRb = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrRb = client.prepareSearch(Config.INDEX_QLR.getContent())
+				.setTypes(Config.TYPE_QLR.getContent()).setSize(100);
 		SearchResponse response1 = qlrRb.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
 		long qlrCount = hits1.getTotalHits();
@@ -191,7 +211,8 @@ public class QueryKeti {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder ketiSearchRB = client.prepareSearch("keti_1y").setTypes("keti_1y").setSize(100);
+		SearchRequestBuilder ketiSearchRB = client.prepareSearch(Config.INDEX_KETI.getContent())
+				.setTypes(Config.TYPE_KETI.getContent()).setSize(100);
 
 		// SearchResponse response =
 		// client.prepareSearch(index).setTypes(type).setSize(size).execute().actionGet();
@@ -218,7 +239,8 @@ public class QueryKeti {
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.filter(QueryBuilders.termQuery("records", 0)).must(QueryBuilders.termsQuery("bdcdyh", bdcdyhList));
 
-		SearchRequestBuilder qlrRb = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrRb = client.prepareSearch(Config.INDEX_QLR.getContent())
+				.setTypes(Config.INDEX_QLR.getContent()).setSize(100);
 		SearchResponse response1 = qlrRb.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 		SearchHits hits1 = response1.getHits();
 		long qlrCount = hits1.getTotalHits();

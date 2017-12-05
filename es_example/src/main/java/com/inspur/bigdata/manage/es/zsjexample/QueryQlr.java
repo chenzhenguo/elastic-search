@@ -63,29 +63,29 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 public class QueryQlr {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static String clustername = "es";
-	private static String indexname = "qlr1";
-	private static String typename = "qlr1";
-	private static int aggType = 0;// 0:官方推荐 1：多线程
+	private static String indexname = "qlr10";
+	private static String typename = "qlr10";
+	private static int aggType = 1;// 0:官方推荐 1：多线程
 
 	/*****
 	 * 0：虚拟机 1：实体机
 	 */
-	private static String linuxType = "0";
+	private static String linuxType = "1";
 
 	public static void main(String[] args) throws UnknownHostException, InterruptedException {
 
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		// getQyrsBYName(client, "宰勤");
+		 //getQyrsBYName(client, "能嘉");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
-		//getQyrsBYZjh(client, "510301198702256481");
+		//getQyrsBYZjh(client, "433123197708240312");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
-		// getQyrsBYNameAndDw(client, "松馨", "悲簿屿忘庞赞宠指爷毫杰辞");
+		 getQyrsBYNameAndDw(client, "从娅", "渤眶劣噶忿亦雪桥待睬倔章");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		 getQyrsBYNone(client);
+		 //getQyrsBYNone(client);
 
 		client.close();
 
@@ -105,12 +105,9 @@ public class QueryQlr {
 		// .addTransportAddress(new
 		// InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
 		if (linuxType.equals("1")) {
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.7"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.8"), 9300));
 		} else {
 			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.130"), 9300));
 			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.131"), 9300));
@@ -127,7 +124,7 @@ public class QueryQlr {
 
 		// 首先获取课题的100条信息
 
-		SearchRequestBuilder qlrSearchRB = client.prepareSearch("qlr_1y").setTypes("qlr_1y").setSize(100);
+		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.matchPhraseQuery("xm", nm)).must(QueryBuilders.matchPhraseQuery("dw", dw))
@@ -200,7 +197,7 @@ public class QueryQlr {
 		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
 		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.filter(QueryBuilders.termQuery("xm", name)).filter(QueryBuilders.termQuery("records", 0));
+				.must(QueryBuilders.termQuery("xm", name)).must(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -274,7 +271,7 @@ public class QueryQlr {
 	 * @param qlrHits
 	 * @param zjSets
 	 */
-	private static void tjByMutiThread(TransportClient client, String name, long start, SearchHits qlrHits,
+	private static void tjByMutiThread(TransportClient client,final String name, long start, SearchHits qlrHits,
 			Set<String> zjSets) {
 		ExecutorService threadPool = Executors.newFixedThreadPool(100);
 
