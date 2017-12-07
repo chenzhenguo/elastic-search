@@ -28,16 +28,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 class EsConfig {
-	public static final String KETI_INDEX = "keti1";
-	public static final String KETI_TYPE = "keti1";
-	public static final String QUANLI_INDEX = "ql1";
-	public static final String QUANLI_TYPE = "ql1";
-	public static final String QUANLIREN_INDEX = "qlr1";
-	public static final String QUANLIREN_TYPE = "qlr1";
+	public static final String KETI_INDEX = "keti10_5";
+	public static final String KETI_TYPE = "keti10_5";
+	public static final String QUANLI_INDEX = "ql10_5";
+	public static final String QUANLI_TYPE = "ql10_5";
+	public static final String QUANLIREN_INDEX = "qlr10_5";
+	public static final String QUANLIREN_TYPE = "qlr10_5";
 	/***
 	 * 虚拟机：0 实体机：1
 	 */
-	public static final String LINUX_TYPE = "0";
+	public static final String LINUX_TYPE = "1";
 
 }
 
@@ -117,7 +117,7 @@ public class WriteToEsMultiThread {
 	// public static String hostname = "10.110.13.174";
 	// public static String hostname = "localhost";
 	public static String clustername = "es";
-	public static double count = 1000000.0d;
+	public static double count = 400000000.0;
 	public static ObjectMapper mapper = new ObjectMapper();
 
 	public static TransportClient getClient1withNOxpack() throws UnknownHostException {
@@ -131,14 +131,12 @@ public class WriteToEsMultiThread {
 			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.132"), 9300));
 
 		} else {
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.174"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.175"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.176"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.7"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.8"), 9300));
 			// client.addTransportAddress(new
 			// InetSocketTransportAddress(InetAddress.getByName("10.110.13.177"),
 			// 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.178"), 9300));
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.13.179"), 9300));
 		}
 
 		return client;

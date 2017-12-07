@@ -30,7 +30,12 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 enum Config {
-	INDEX_KETI("keti10"), INDEX_QLR("qlr10"), INDEX_QL("QL10"), TYPE_KETI("keti10"), TYPE_QLR("qlr10"), TYPE_QL("QL10");
+//	INDEX_KETI("keti1_5"), INDEX_QLR("qlr1_5"), INDEX_QL("ql1_5"), TYPE_KETI("keti1_5"), TYPE_QLR("qlr1_5"), TYPE_QL(
+//			"ql1_5");
+
+	 INDEX_KETI("keti1_10"), INDEX_QLR("qlr1_10"), INDEX_QL("ql1_10"),
+	 TYPE_KETI("keti1_10"), TYPE_QLR(
+	 "qlr1_10"), TYPE_QL("ql1_10");
 	private String content;
 
 	Config(String content) {
@@ -55,15 +60,15 @@ public class QueryKeti {
 
 		TransportClient client = getClient1withNOxpack();
 		// 查询场景：查询出客体前100条记录，无条件，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		 getQyrsBYNone(client);
+		//getQyrsBYNone(client);
 
 		// 查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
-		// getQyrsByBdcdyhOrZl(client, "zl","涿州");
+		 getQyrsByBdcdyhOrZl(client, "zl","安丘");
 		// getQyrsByBdcdyhOrZl(client,
 		// "bdcdyh","210500588529GB97927F654278671");
 
 		// 查询出客体前100条记录，条件：坐落+行政区划，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		//getQlrByZlXzqh(client, "涞源", "130630");
+		// getQlrByZlXzqh(client, "涞源", "130630");
 		client.close();
 
 	}
@@ -81,9 +86,9 @@ public class QueryKeti {
 		// InetSocketTransportAddress(InetAddress.getByName("host1"), 9300))
 		// .addTransportAddress(new
 		// InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.7"), 9300));
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.8"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.130"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.131"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.110.18.132"), 9300));
 
 		return client;
 	}
