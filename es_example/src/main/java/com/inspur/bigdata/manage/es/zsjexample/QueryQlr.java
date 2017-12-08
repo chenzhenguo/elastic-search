@@ -60,32 +60,40 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
  *
  */
 
+class Qlr {
+	 public static final String indexname = "qlr10_5";
+	 public static final String typename = "qlr10_5";
+//	public static final String indexname = "qlr10yi";
+//	public static final String typename = "qlr10yi";
+
+}
+
 public class QueryQlr {
 	public static SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static String clustername = "es";
-	private static String indexname = "qlr1";//qlr10yi
-	private static String typename = "qlr1";//qlr10yi
-	private static int aggType = 0;// 0:官方推荐 1：多线程
+	private static String indexname = Qlr.indexname;// qlr10yi
+	private static String typename = Qlr.typename;// qlr10yi
+	private static int aggType = 1;// 0:官方推荐 1：多线程
 
 	/*****
 	 * 0：虚拟机 1：实体机
 	 */
-	private static String linuxType = "0";
+	private static String linuxType = "1";
 
 	public static void main(String[] args) throws UnknownHostException, InterruptedException {
 
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		 getQyrsBYName(client, "尤峰");
+		// getQyrsBYName(client, "辛雅秋");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
-		//getQyrsBYZjh(client, "433123197708240312");
+		//getQyrsBYZjh(client, "511302200403146271");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
-		// getQyrsBYNameAndDw(client, "从娅", "渤眶劣噶忿亦雪桥待睬倔章");
+		 getQyrsBYNameAndDw(client, "相钧进", "阵鳖析饲寐鳞栋幕构乱崩揪");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		 //getQyrsBYNone(client);
+		// getQyrsBYNone(client);
 
 		client.close();
 
@@ -196,8 +204,8 @@ public class QueryQlr {
 
 		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.must(QueryBuilders.termQuery("xm", name)).must(QueryBuilders.termQuery("records", 0));
+		BoolQueryBuilder qlrBoolQueryQueryBuilder1 = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("xm", name))
+				.must(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryQueryBuilder1).execute().actionGet();
 
@@ -271,7 +279,7 @@ public class QueryQlr {
 	 * @param qlrHits
 	 * @param zjSets
 	 */
-	private static void tjByMutiThread(TransportClient client,final String name, long start, SearchHits qlrHits,
+	private static void tjByMutiThread(TransportClient client, final String name, long start, SearchHits qlrHits,
 			Set<String> zjSets) {
 		ExecutorService threadPool = Executors.newFixedThreadPool(100);
 
@@ -281,16 +289,17 @@ public class QueryQlr {
 			threadPool.submit(() -> {
 
 				long threadStart = System.currentTimeMillis();
-//				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + "start time :" + (threadStart));
+				// System.out.println(Thread.currentThread().getName() + "zjh:"
+				// + zjh + "start time :" + (threadStart));
 
 				SearchRequestBuilder qlrTj = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
 				BoolQueryBuilder qlrTjBool = null;
 				if (StringUtils.isNotBlank(name)) {
-					qlrTjBool=QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh))
+					qlrTjBool = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh))
 							.must(QueryBuilders.termQuery("xm", name));
 				} else {
-					qlrTjBool=QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh));
+					qlrTjBool = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("zjh", zjh));
 				}
 
 				SearchResponse qlrTjResponse = qlrTj.setQuery(qlrTjBool).execute().actionGet();
@@ -301,8 +310,10 @@ public class QueryQlr {
 						+ qlrTjHits.getHits()[0].getSource().get("xm"));
 
 				long tEnd = System.currentTimeMillis();
-//				System.out.println(Thread.currentThread().getName() + "zjh:" + zjh + " ,xm:"
-//						+ qlrTjHits.getHits()[0].getSource().get("xm") + "cost time :" + (tEnd - threadStart));
+				// System.out.println(Thread.currentThread().getName() + "zjh:"
+				// + zjh + " ,xm:"
+				// + qlrTjHits.getHits()[0].getSource().get("xm") + "cost time
+				// :" + (tEnd - threadStart));
 
 			});
 
@@ -330,8 +341,7 @@ public class QueryQlr {
 
 		SearchRequestBuilder qlrSearchRB = client.prepareSearch(indexname).setTypes(typename).setSize(100);
 
-		BoolQueryBuilder qlrBoolQueryBuilder1 = QueryBuilders.boolQuery()
-				.filter(QueryBuilders.termQuery("records", 0));
+		BoolQueryBuilder qlrBoolQueryBuilder1 = QueryBuilders.boolQuery().filter(QueryBuilders.termQuery("records", 0));
 
 		SearchResponse qlrResponse = qlrSearchRB.setQuery(qlrBoolQueryBuilder1).execute().actionGet();
 
