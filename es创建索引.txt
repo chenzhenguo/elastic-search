@@ -1,0 +1,122 @@
+DELETE  keti10_10
+PUT  keti10_10
+{
+    "settings" : {
+        "number_of_shards":10,
+        "number_of_replicas" : 1
+     },
+      "mappings": {
+      "keti10_10": {
+        "properties": {
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "lx": {
+            "type": "keyword"
+          },
+          "postDate": {
+            "type": "date","format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "qx": {
+            "type": "keyword"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "keyword"
+          },
+          "zl": {
+            "type": "text",
+             "analyzer": "ik_max_word"
+          }
+        }
+      }
+    }
+}
+
+
+DELETE  ql10_10
+
+PUT ql10_10
+{
+   "settings" : {
+        "number_of_shards":10,
+        "number_of_replicas" : 1
+     },
+      "mappings": {
+      "ql10_10": {
+        "properties": {
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "postDate": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "qllx": {
+            "type": "keyword"
+          },
+          "qlxz": {
+            "type": "keyword"
+          },
+          "qx": {
+            "type": "keyword"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+}
+
+
+GET qlr1/_mapping 
+
+DELETE  qlr10_10
+
+PUT  qlr10_10
+{
+        "settings" : {
+        "number_of_shards":10,
+        "number_of_replicas" : 1
+     },
+      "mappings": {
+      "qlr10_10": {
+        "properties": {
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "dw": {
+            "type": "text"
+          },
+          "lx": {
+            "type": "keyword"
+          },
+          "postDate": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+          },
+          "qluuid": {
+            "type": "keyword"
+          },
+          "records": {
+            "type": "integer"
+          },
+          "uuid": {
+            "type": "keyword"
+          },
+          "xm": {
+            "type": "keyword"
+          },
+          "zjh": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+}

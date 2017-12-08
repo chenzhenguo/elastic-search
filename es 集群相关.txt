@@ -1,0 +1,6 @@
+GET _cat/indices
+
+GET /_nodes
+
+GET  /_cat/shards
+GET _cat/indices

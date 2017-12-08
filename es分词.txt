@@ -1,0 +1,11 @@
+GET _analyze
+{
+  "analyzer":"ik_max_word",
+  "text":"四川省成都市新津县"
+}
+
+GET _analyze/
+{
+  "analyzer":"ik_smart",
+  "text":"广西省壮族自治柳州市鹿寨县"
+}

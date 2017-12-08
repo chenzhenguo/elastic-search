@@ -1,0 +1,7 @@
+GET keti/_search
+{
+   "_source": {
+       "include": ["bdcdyh"],
+     "excludes" : ["path3.*"]
+   }
+}
