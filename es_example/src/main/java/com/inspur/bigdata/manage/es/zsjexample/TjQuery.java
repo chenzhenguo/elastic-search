@@ -616,8 +616,8 @@ public class TjQuery {
 		for (int i = 0; i < count; i++) {
 			long a1 = Calendar.getInstance().getTimeInMillis();
 			
-			 //anshengtongjiketishuliang(client);
-			//anshengtongjiqlshuliang(client);
+			 anshengtongjiketishuliang(client);
+			 anshengtongjiqlshuliang(client);
 			
 			
 			// testcardinality(client);
@@ -637,7 +637,7 @@ public class TjQuery {
 			// quanli_quxian(client);
 			// test(client);
 			
-			// anquanlileixtongji(client);
+			 anquanlileixtongji(client);
 			long a2 = Calendar.getInstance().getTimeInMillis();
 			System.out.println(String.valueOf(a2 - a1).concat("毫秒"));
 			all = all + a2 - a1;

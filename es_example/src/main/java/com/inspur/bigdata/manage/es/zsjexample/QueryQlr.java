@@ -61,10 +61,15 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
  */
 
 class Qlr {
-	 public static final String indexname = "qlr10_5";
-	 public static final String typename = "qlr10_5";
+
 //	public static final String indexname = "qlr10yi";
 //	public static final String typename = "qlr10yi";
+	//
+	 public static final String indexname = "qlr10_5";
+	 public static final String typename = "qlr10_5";
+	//
+	// public static final String indexname = "qlr10_10";
+	// public static final String typename = "qlr10_10";
 
 }
 
@@ -85,15 +90,15 @@ public class QueryQlr {
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		// getQyrsBYName(client, "辛雅秋");
+		// getQyrsBYName(client, "茹超斌");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
-		//getQyrsBYZjh(client, "511302200403146271");
+		// getQyrsBYZjh(client, "511681196207108297");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
-		 getQyrsBYNameAndDw(client, "相钧进", "阵鳖析饲寐鳞栋幕构乱崩揪");
+		// getQyrsBYNameAndDw(client, "杜倩香", "凌喳邓遥育跪讨搂先睛巳闺");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		// getQyrsBYNone(client);
+		getQyrsBYNone(client);
 
 		client.close();
 
