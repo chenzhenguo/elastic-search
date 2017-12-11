@@ -1,4 +1,4 @@
-package com.hbase.observer;
+package com.hbase.observer.v2;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -24,8 +24,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ESClient {
-	private static final Log log = LogFactory.getLog(ESClient.class);
+public class ESClientv2 {
+	private static final Log log = LogFactory.getLog(ESClientv2.class);
     // ElasticSearch的集群名称
     public static String clusterName;
     // ElasticSearch的host
@@ -48,7 +48,7 @@ public class ESClient {
     public static String getInfo() {
         List<String> fields = new ArrayList<String>();
         try {
-            for (Field f : ESClient.class.getDeclaredFields()) {
+            for (Field f : ESClientv2.class.getDeclaredFields()) {
                 fields.add(f.getName() + "=" + f.get(null));
             }
         } catch (IllegalAccessException ex) {
@@ -61,14 +61,13 @@ public class ESClient {
      * init ES client
      */
     public static void initEsClient() throws UnknownHostException {
-    	log.error("--initEsClient----start ------");
         Settings settings = Settings.builder()
-                .put("cluster.name", ESClient.clusterName)
+                .put("cluster.name", ESClientv2.clusterName)
                 .put("transport.type", "netty3")
                 .put("http.type", "netty3")
                 .build();
         client = new PreBuiltTransportClient(settings);
-        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(ESClient.nodeHost), ESClient.nodePort));
+        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(ESClientv2.nodeHost), ESClientv2.nodePort));
         bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
 			public void beforeBulk(long executionId, BulkRequest request) {
 			}
@@ -81,16 +80,13 @@ public class ESClient {
 		}).setBulkActions(10000).setBulkSize(new ByteSizeValue(1, ByteSizeUnit.MB))
 				.setFlushInterval(TimeValue.timeValueSeconds(5)).setConcurrentRequests(1)
 				.setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)).build();
-        log.error("--initEsClient----end ------");
-
-
 }
 
     /**
      * Close ES client
      */
     public static void closeEsClient() {
-    	ESClient.bulkProcessor.close();
+    	ESClientv2.bulkProcessor.close();
         client.close();
     }
 }

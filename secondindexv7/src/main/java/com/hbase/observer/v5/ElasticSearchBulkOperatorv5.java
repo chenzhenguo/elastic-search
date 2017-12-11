@@ -1,4 +1,4 @@
-package com.hbase.observer;
+package com.hbase.observer.v5;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ElasticSearchBulkOperator {
-    private static final Log LOG = LogFactory.getLog(ElasticSearchBulkOperator.class);
+public class ElasticSearchBulkOperatorv5{
+    private static final Log LOG = LogFactory.getLog(ElasticSearchBulkOperatorv5.class);
 
-    private static final int MAX_BULK_COUNT = 10000;
+    private static final int MAX_BULK_COUNT = 500;
 
     private static BulkRequestBuilder bulkRequestBuilder = null;
 
@@ -26,7 +26,7 @@ public class ElasticSearchBulkOperator {
 
     static {
         // init es bulkRequestBuilder
-        bulkRequestBuilder = ESClient.client.prepareBulk();
+        bulkRequestBuilder = ESClientv5.client.prepareBulk();
         //--------------------------------------  目前此refresh接口不存在了
 //        bulkRequestBuilder.setRefresh(true);
 
@@ -41,8 +41,8 @@ public class ElasticSearchBulkOperator {
                 try {
                     bulkRequest(0);
                 } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                    LOG.error("Time Bulk " + ESClient.indexName + " index error : " + ex.getMessage());
+//                    System.out.println(ex.getMessage());
+                    LOG.error("Time Bulk "+ ex.getMessage());
                 } finally {
                     commitLock.unlock();
                 }
@@ -76,7 +76,7 @@ public class ElasticSearchBulkOperator {
             BulkResponse bulkItemResponse = bulkRequestBuilder.execute().actionGet();
             LOG.error("============008");
             if (!bulkItemResponse.hasFailures()) {
-                bulkRequestBuilder = ESClient.client.prepareBulk();
+                bulkRequestBuilder = ESClientv5.client.prepareBulk();
                 LOG.error("============009");
             }
         }
@@ -95,7 +95,7 @@ public class ElasticSearchBulkOperator {
             LOG.error("============005");
             bulkRequest(MAX_BULK_COUNT);
         } catch (Exception ex) {
-            LOG.error(" update Bulk " + ESClient.indexName + " index error : " + ex.getMessage());
+            LOG.error(" update Bulk "  + ex.getMessage());
         } finally {
             commitLock.unlock();
         }
@@ -113,7 +113,7 @@ public class ElasticSearchBulkOperator {
             bulkRequestBuilder.add(builder);
             bulkRequest(MAX_BULK_COUNT);
         } catch (Exception ex) {
-            LOG.error(" delete Bulk " + ESClient.indexName + " index error : " + ex.getMessage());
+            LOG.error(" delete Bulk "  + ex.getMessage());
         } finally {
             commitLock.unlock();
         }

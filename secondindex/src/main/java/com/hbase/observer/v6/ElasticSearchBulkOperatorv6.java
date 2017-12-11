@@ -1,22 +1,25 @@
-package com.hbase.observer;
+package com.hbase.observer.v6;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
 
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ElasticSearchBulkOperator {
-    private static final Log LOG = LogFactory.getLog(ElasticSearchBulkOperator.class);
+public class ElasticSearchBulkOperatorv6{
+    private static final Log LOG = LogFactory.getLog(ElasticSearchBulkOperatorv6.class);
 
-    private static final int MAX_BULK_COUNT = 10000;
+    private static final int MAX_BULK_COUNT = 500;
 
     private static BulkRequestBuilder bulkRequestBuilder = null;
 
@@ -26,7 +29,7 @@ public class ElasticSearchBulkOperator {
 
     static {
         // init es bulkRequestBuilder
-        bulkRequestBuilder = ESClient.client.prepareBulk();
+        bulkRequestBuilder = ESClientv6.client.prepareBulk();
         //--------------------------------------  目前此refresh接口不存在了
 //        bulkRequestBuilder.setRefresh(true);
 
@@ -41,8 +44,8 @@ public class ElasticSearchBulkOperator {
                 try {
                     bulkRequest(0);
                 } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                    LOG.error("Time Bulk " + ESClient.indexName + " index error : " + ex.getMessage());
+//                    System.out.println(ex.getMessage());
+                    LOG.error("Time Bulk "+ ex.getMessage());
                 } finally {
                     commitLock.unlock();
                 }
@@ -70,16 +73,27 @@ public class ElasticSearchBulkOperator {
      * @param threshold
      */
     private static void bulkRequest(int threshold) {
-    	LOG.error("============006");
-        if (bulkRequestBuilder.numberOfActions() > threshold) {
-        	LOG.error("============007");
-            BulkResponse bulkItemResponse = bulkRequestBuilder.execute().actionGet();
-            LOG.error("============008");
-            if (!bulkItemResponse.hasFailures()) {
-                bulkRequestBuilder = ESClient.client.prepareBulk();
-                LOG.error("============009");
-            }
-        }
+		if (bulkRequestBuilder.numberOfActions() > threshold) {
+			try {
+				BulkResponse bulkItemResponse = bulkRequestBuilder.execute().actionGet();
+				if (!bulkItemResponse.hasFailures()) {
+					LOG.error(bulkItemResponse.buildFailureMessage());
+				}
+				bulkRequestBuilder = ESClientv6.client.prepareBulk();
+			} catch (Exception e) {
+				 LOG.error(" Bulk Request " + " index error : " + e.getMessage());  
+	                LOG.error("Reconnect the ES server...");  
+	                List<DocWriteRequest> tempRequests = bulkRequestBuilder.request().requests();  
+	                ESClientv6.client.close();  
+	                try {
+						ESClientv6.initEsClient();
+					} catch (Exception e1) {
+						LOG.error("重连es client 失败"+e1.getMessage());  
+					};  
+	                bulkRequestBuilder = ESClientv6.client.prepareBulk();  
+	                bulkRequestBuilder.request().add(tempRequests);  
+			}
+		}
     }
 
     /**
@@ -95,7 +109,7 @@ public class ElasticSearchBulkOperator {
             LOG.error("============005");
             bulkRequest(MAX_BULK_COUNT);
         } catch (Exception ex) {
-            LOG.error(" update Bulk " + ESClient.indexName + " index error : " + ex.getMessage());
+            LOG.error(" update Bulk "  + ex.getMessage());
         } finally {
             commitLock.unlock();
         }
@@ -113,7 +127,7 @@ public class ElasticSearchBulkOperator {
             bulkRequestBuilder.add(builder);
             bulkRequest(MAX_BULK_COUNT);
         } catch (Exception ex) {
-            LOG.error(" delete Bulk " + ESClient.indexName + " index error : " + ex.getMessage());
+            LOG.error(" delete Bulk "  + ex.getMessage());
         } finally {
             commitLock.unlock();
         }
