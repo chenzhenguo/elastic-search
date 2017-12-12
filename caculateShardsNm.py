@@ -1,17 +1,17 @@
 
 
 
-recordsPerGMap=dict(oneQlrRecords=808482,oneQlRecords=808480,oneKetiRecords=1342729)
+recordsPerGMap=dict(oneGQlrRecords=808482,oneGQlRecords=808480,oneGKetiRecords=1342729)
 
 def getShardNum(machineNm,totalData,replies=1,bestNmPerShard=30,indexType='qlr'):
    capacity=0
 
    if 'qlr' in indexType:
-       recordsPerG=recordsPerGMap['oneQlrRecords']
+       recordsPerG=recordsPerGMap['oneGQlrRecords']
    elif 'ql' in indexType:
-       recordsPerG=recordsPerGMap['oneQlRecords']
+       recordsPerG=recordsPerGMap['oneGQlRecords']
    else:
-       recordsPerG=recordsPerGMap['oneKetiRecords']
+       recordsPerG=recordsPerGMap['oneGKetiRecords']
 
    capacity=divmod(totalData,recordsPerG)[0]
    replies+=1
