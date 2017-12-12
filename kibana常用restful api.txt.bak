@@ -126,108 +126,6 @@ GET  keti10_10/_search
 }
 
 
-#juhe聚合 先查询再聚合 
-GET  keti10_10/_search
-{
-  "query": {         
-    "match": {
-      "zl": "淄博"
-    }
-  },
-  "aggs": {
-    "max_record": {
-      "max": {
-        "field": "records"
-      }
-    }
-  }
-}
-
-GET  keti10_10/_search
-{
-  "query": {         
-    "match": {
-      "zl": "淄博"
-    }
-  },
-  "aggs": {
-    "max_record": {
-      "avg": {
-        "field": "records"
-      }
-    }
-  }
-}
-
-
-GET qlr10_10/_search
-
-#嵌套聚合
-GET study1/_search
-{
-  "aggs": {
-    "bdcdyhs": {
-      "terms": {
-        "field": "bdcdyh"
-      },
-      "aggs": {       
-        "max_records": {
-          "max": {    
-            "field": "age"
-          }
-        }
-      }
-    }
-  }
-}
-
-#写入数据 
-PUT study1/study1/1
-{
-  "name":"wl",
-  "bdcdyh":"001",
-  "lx":"53",
-  "age":27
-}
-
-
-PUT study1
-{
-  "settings" : {
-        "number_of_shards":3,
-        "number_of_replicas" : 1,
-        "refresh_interval":"30s"
-     },
-  "mappings": 
-  {
-    "study1": {
-        "properties": {
-          "name":{
-            "type":"keyword"
-          },
-          "bdcdyh": {
-            "type": "keyword"
-          },
-          "lx": {
-            "type": "keyword"
-            },
-          "age":{
-              "type":"integer"
-            }
-          }
-      }
-  }
-}
-DELETE  study1
-
-PUT /study1/_mapping/study1
-{
-  "properties": {
-    "address": {
-      "type": "keyword"
-    }
-  }
-}
 
 POST /_aliases
 {  
@@ -273,7 +171,47 @@ POST /_aliases
 
 }
 
+PUT study1
+{
+  "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+  "mappings": 
+  {
+    "study1": {
+        "properties": {
+          "name":{
+            "properties":
+            {
+              "first":{"type":"text"},
+              "last":{"type":"text"}
+            }
+          },
+          "bdcdyh": {
+            "type": "keyword"
+          },
+          "lx": {
+            "type": "keyword"
+            },
+            "age":{
+              "type":"integer"
+            }
+          }
+      }
+  }
+}
+DELETE  study1
 
+PUT /study1/_mapping/study1
+{
+  "properties": {
+    "address": {
+      "type": "keyword"
+    }
+  }
+}
 
 GET /qlr/_search
 
