@@ -48,7 +48,7 @@ public class ESClientv7 {
 	public static void initEsClient() throws UnknownHostException {
 		if (client == null) {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss:SSS");
-			log.error("initESClient:"+sdf.format(new Date()));
+			log.info("开始 initESClient:"+sdf.format(new Date()));
 			Settings settings = Settings.builder().put("cluster.name", ESClientv7.clusterName)
 					.put("client.transport.sniff", "true").put("transport.type", "netty3").put("http.type", "netty3")
 					.build();
@@ -58,6 +58,7 @@ public class ESClientv7 {
 				client.addTransportAddress(
 						new InetSocketTransportAddress(InetAddress.getByName(host), ESClientv7.nodePort));
 			}
+			log.info("完成 initESClient:"+sdf.format(new Date()));
 		}
 	}
 
@@ -65,6 +66,11 @@ public class ESClientv7 {
 	 * Close ES client
 	 */
 	public static void closeEsClient() {
+		try{
 		client.close();
+		}catch(Exception e){
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+            System.out.println("closeEsClient:" + fullStackTrace);
+		}
 	}
 }

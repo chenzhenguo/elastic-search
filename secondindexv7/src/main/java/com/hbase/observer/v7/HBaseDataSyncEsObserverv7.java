@@ -59,6 +59,9 @@ public class HBaseDataSyncEsObserverv7 extends BaseRegionObserver {
 		ESClientv7.clusterName = conf.get("es_cluster");
 		ESClientv7.nodeHost = conf.get("es_host");
 		ESClientv7.nodePort = conf.getInt("es_port", 9300);
+		log.error("ESClientv7.clusterName = :"+ESClientv7.clusterName);
+		log.error("ESClientv7.nodeHost:"+ESClientv7.nodeHost);
+		log.error("ESClientv7.nodePort:"+ESClientv7.nodePort);
 		try {
 			Table table = env.getTable(TableName.valueOf(INDEXNAME));
 			Scan scan = new Scan();
@@ -94,14 +97,19 @@ public class HBaseDataSyncEsObserverv7 extends BaseRegionObserver {
 	 * 这个方法会在regionserver打开region时候执行
 	 */
 	public void start(CoprocessorEnvironment e) throws IOException {
+		log.info("HBaseDataSyncEsObserverv7  start 111");
 		readConfiguration(e);
+		log.info("HBaseDataSyncEsObserverv7  start 222");
 		ESClientv7.initEsClient();
+		log.info("HBaseDataSyncEsObserverv7  start 333");
 		bulkRequestBuilder = ESClientv7.client.prepareBulk();
+		log.info("HBaseDataSyncEsObserverv7  start 444");
 	}
 
 	public void stop(CoprocessorEnvironment e) throws IOException {
+		log.info("HBaseDataSyncEsObserverv7:stop 111");
 		ESClientv7.closeEsClient();
-
+		log.info("HBaseDataSyncEsObserverv7:stop 222");
 		// ElasticSearchBulkOperatorv7.shutdownScheduEx();
 	}
 

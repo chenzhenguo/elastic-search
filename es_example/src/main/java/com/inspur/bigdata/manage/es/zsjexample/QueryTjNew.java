@@ -89,7 +89,7 @@ public class QueryTjNew {
 
 				KeyedFilter fa = new FiltersAggregator.KeyedFilter(qx, QueryBuilders.prefixQuery("qx", qx));
 				AggregationBuilder gradeTermsBuilder = AggregationBuilders.filters("ketitj", fa);
-
+				
 				SearchRequestBuilder srb = client.prepareSearch(ketiIndexName).setTypes(ketiTypeName).setSize(100);
 				srb.addAggregation(gradeTermsBuilder);
 
