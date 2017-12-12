@@ -3,6 +3,7 @@ GET _cat/indices
 GET /_nodes
 
 GET  /_cat/shards
+GET _cat/indices
 
 GET /keti/_count
 
@@ -14,6 +15,23 @@ GET keti/_search
    }
 }
 
+DELETE qlr10yi3_1
+
+
+
+PUT /qlr10yi1_0/_settings
+{
+  "index":{"refresh_interval":"10s"}
+}
+
+PUT  /ql10_10/_settings
+{
+  "index":{"refresh_interval":"10s"}
+}
+
+GET /qlr10_10/_mapping
+
+
  GET /qlr/_search
 {
        "query": {
@@ -22,6 +40,91 @@ GET keti/_search
       }
       }
 }
+#评分
+GET  keti10_10/_search
+{
+    "query":{
+      "term" : {
+        "lx" : 3
+       }
+    }
+    
+}
+#不评分
+GET  keti10_10/_search
+{
+    "query" : {
+        "constant_score" : { 
+            "filter" : {
+                "term" : { 
+                    "lx" : 3
+                }
+            }
+        }
+    }
+}
+#组合的组合布尔布尔查询组合的布尔布尔查询
+GET  keti10_10/_search
+{
+   "query" : {
+            "bool" : {
+              "should" : [
+                 { "term" : {"lx" : 3}}
+              ],
+              "must_not" : {
+                 "term" : {"qx" : "513427"} 
+              }
+           }
+         }
+}
+
+#search multi real docs
+GET  keti10_10/_search
+{
+    "query" : {
+        "constant_score" : { 
+            "filter" : {
+                "terms" : { 
+                    "lx" : [3,9]
+                }
+            }
+        }
+    }
+}
+
+
+GET qlr10_10/_mapping
+
+#match search first words fixed
+GET  keti10_10/_search
+{
+    "query": {
+        "match_phrase": {
+            "zl": "四川"
+        }
+    }
+}
+
+#match search
+GET  keti10_10/_search
+{
+    "query": {
+        "match": {
+            "zl": "淄博"
+        }
+    }
+}
+
+#多词查询
+GET  keti10_10/_search
+{
+    "query": {
+        "match": {
+            "zl": "淄博 张店"
+        }
+    }
+}
+
 
 
 POST /_aliases
@@ -146,7 +249,22 @@ GET qlr1/_mapping
 
 GET keti_1y/_mapping
 
-GET keti_1y/_search
+
+GET _analyze
+{
+  "analyzer":"ik_max_word",
+  "text":"西藏自治区日喀则市岗巴县"
+}
+
+GET _analyze/
+{
+  "analyzer":"ik_smart",
+  "text":"广西省壮族自治柳州市鹿寨县"
+}
+
+GET keti10yi/_mapping
+
+GET keti10yi/_search
 {
   "size": 100, 
   "_source": {
@@ -155,7 +273,7 @@ GET keti_1y/_search
    }
 }
 
-GET qlr1/_search
+GET qlr10_10/_search
 {
   "size": 100, 
   "_source": {
@@ -268,16 +386,17 @@ PUT study1
   }
 }
 
-DELETE  keti1
-PUT  keti1
+GET  keti10_5/_settings
+
+DELETE  keti10_10
+PUT  keti001
 {
     "settings" : {
-        "number_of_shards":3,
-        "number_of_replicas" : 1,
-        "refresh_interval":"30s"
+        "number_of_shards":10,
+        "number_of_replicas" : 1
      },
       "mappings": {
-      "keti1": {
+      "keti001": {
         "properties": {
           "bdcdyh": {
             "type": "keyword"
@@ -307,17 +426,16 @@ PUT  keti1
 }
 
 
-DELETE  ql1
+DELETE  ql10_10
 
-PUT ql1
+PUT ql001
 {
    "settings" : {
-        "number_of_shards":3,
-        "number_of_replicas" : 1,
-        "refresh_interval":"30s"
+        "number_of_shards":10,
+        "number_of_replicas" : 1
      },
       "mappings": {
-      "ql1": {
+      "ql001": {
         "properties": {
           "bdcdyh": {
             "type": "keyword"
@@ -349,17 +467,16 @@ PUT ql1
 
 GET qlr1/_mapping 
 
-DELETE  qlr1
+DELETE  qlr001
 
-PUT  qlr1
+PUT  qlr001
 {
         "settings" : {
-        "number_of_shards":3,
-        "number_of_replicas" : 1,
-        "refresh_interval":"30s"
-     },
+        "number_of_shards":10,
+        "number_of_replicas" : 1
+        },
       "mappings": {
-      "qlr1": {
+      "qlr001": {
         "properties": {
           "bdcdyh": {
             "type": "keyword"
@@ -396,10 +513,11 @@ PUT  qlr1
 
 GET keti3/_mapping
 
-PUT  keti3
+DELETE  keti001
+PUT  keti001
 {
   "mappings": {
-    "keti3": {
+    "keti001": {
       "properties": {
         "bdcdyh": {
           "type":  "keyword"

@@ -54,7 +54,7 @@ public class QueryKeti {
 		// getQyrsBYNone(client);
 
 		// 查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
-		 //getQyrsByBdcdyhOrZl(client, "zl","青岛");
+		 getQyrsByBdcdyhOrZl(client, "zl","青岛");
 //		 getQyrsByBdcdyhOrZl(client, "bdcdyh",
 //		 "510402037988GB60680F748486014");
 
@@ -168,6 +168,7 @@ public class QueryKeti {
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("records", 0)).must(QueryBuilders.termsQuery(key, paramV));
+		
 
 		SearchResponse ketiResponse = ketiSearchRB.setQuery(ketiBoolQueryQueryBuilder1).execute().actionGet();
 
