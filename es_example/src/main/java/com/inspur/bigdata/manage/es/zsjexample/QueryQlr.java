@@ -91,15 +91,15 @@ public class QueryQlr {
 		TransportClient client = getClient1withNOxpack();
 
 		// 查询场景：查询权利人，条件：权利人，查询权利人信息
-		getQyrsBYName(client, "宦茗");
+//		getQyrsBYName(client, "郑庆翔");
 		// 查询场景：查询权利人，条件：zjh，查询权利人信息
 		// getQyrsBYZjh(client, "511681196207108297");
 
 		// 查询场景：查询权利人，条件：权利人+工作单位，查询权利人信息
-		// getQyrsBYNameAndDw(client, "杜倩香", "凌喳邓遥育跪讨搂先睛巳闺");
+		 //getQyrsBYNameAndDw(client, "蒋昭莺", "哟命贺振硕喷讨蝗婉舒抡豁");
 
 		// 查询场景：查询出权利人前100条记录，条件：无条件;
-		// getQyrsBYNone(client);
+		 getQyrsBYNone(client);
 
 		client.close();
 

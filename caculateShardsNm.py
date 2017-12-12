@@ -3,6 +3,8 @@
 
 recordsPerGMap=dict(oneGQlrRecords=808482,oneGQlRecords=808480,oneGKetiRecords=1342729)
 
+
+
 def getShardNum(machineNm,totalData,replies=1,bestNmPerShard=30,indexType='qlr'):
    capacity=0
 

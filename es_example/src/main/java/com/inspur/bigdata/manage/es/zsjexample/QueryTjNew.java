@@ -53,11 +53,11 @@ public class QueryTjNew {
 		TransportClient client = getClient1withNOxpack();
 
 		// 场景1：按照省统计不动产数量
-		 tiKetiNmByProvinceMul(client);
+		// tiKetiNmByProvinceMul(client);
 		// 场景2：按照权利类型统计权利数量
-		//tjByQllxByMul(client);
+		// tjByQllxByMul(client);
 		// 场景3：按照省和权利人类型统计权利人数量（按照权利人类型）
-		 //tjKetiNumLeixingGroupByProvince(client);
+		tjKetiNumLeixingGroupByProvince(client);
 		// 场景4：按照省统计不动产证和不动产登记号的数量
 
 	}
@@ -146,12 +146,16 @@ public class QueryTjNew {
 
 		}
 		threadPool.shutdown();
-		try {
-			singnal.await();
-			long endTime = System.currentTimeMillis();
-			System.out.println("cost time:" + (endTime - start) + "ms");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while (true) {
+			try {
+				singnal.await();
+				long endTime = System.currentTimeMillis();
+				System.out.println("cost time:" + (endTime - start) + "ms");
+				break;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}
@@ -256,12 +260,16 @@ public class QueryTjNew {
 			});
 		}
 
-		try {
-			count.await();
-			long endTime = System.currentTimeMillis();
-			System.out.println("总耗时:" + (endTime - startTime) + "ms");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while (true) {
+			try {
+				count.await();
+				long endTime = System.currentTimeMillis();
+				System.out.println("cost time:" + (endTime - startTime) + "ms");
+				break;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}
@@ -301,12 +309,16 @@ public class QueryTjNew {
 		}
 		threadPool.shutdown();
 
-		try {
-			count.await();
-			long endTime = System.currentTimeMillis();
-			System.out.println("cost time:" + (endTime - startTime) + "ms");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while (true) {
+			try {
+				count.await();
+				long endTime = System.currentTimeMillis();
+				System.out.println("cost time:" + (endTime - startTime) + "ms");
+				break;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}
