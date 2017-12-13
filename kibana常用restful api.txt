@@ -15,8 +15,23 @@ GET keti/_search
    }
 }
 
-DELETE qlr10yi3_1
+PUT _snapshot/my_backup
+{ 
+  "type":"hdfs", 
+  "settings":
+   { 
+      "uri":"hdfs://10.110.18.131:8020",
+      "path":"/esbackup"
+    }
+}
 
+GET /_snapshot/my_backup1/snapshot_1/_status
+
+GET /_snapshot
+
+PUT /_snapshot/my_backup/snapshot_1?wait_for_completion=true
+
+DELETE /_snapshot/my_backup1
 
 
 PUT /qlr10yi1_0/_settings
@@ -182,16 +197,17 @@ GET study1/_search
 }
 
 #Ð´ÈëÊý¾Ý 
-PUT study1/study1/1
+PUT tohdfs/study1/3
 {
   "name":"wl",
   "bdcdyh":"001",
-  "lx":"53",
-  "age":27
+  "lx":"54",
+  "age":29
 }
 
+GET tohdfs/_search
 
-PUT study1
+PUT tohdfs
 {
   "settings" : {
         "number_of_shards":3,

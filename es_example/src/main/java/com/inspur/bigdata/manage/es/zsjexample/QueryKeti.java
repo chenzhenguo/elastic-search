@@ -54,12 +54,12 @@ public class QueryKeti {
 		// getQyrsBYNone(client);
 
 		// 查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
-		 getQyrsByBdcdyhOrZl(client, "zl","青岛");
+//		 getQyrsByBdcdyhOrZl(client, "zl","青岛");
 //		 getQyrsByBdcdyhOrZl(client, "bdcdyh",
 //		 "510402037988GB60680F748486014");
 
 		// 查询出客体前100条记录，条件：坐落+行政区划，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		//getQlrByZlXzqh(client, "大连", "210214");
+		getQlrByZlXzqh(client, "昆明", "530122");
 		client.close();
 
 	}
@@ -103,8 +103,8 @@ public class QueryKeti {
 				.setTypes(Config.TYPE_KETI.getContent()).setSize(100);
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
-				.filter(QueryBuilders.termQuery("records", 0)).must(QueryBuilders.matchPhraseQuery("zl", zl))
-				.must(QueryBuilders.matchPhraseQuery("qx", xzqh));
+				.filter(QueryBuilders.termQuery("records", 0)).filter(QueryBuilders.matchPhraseQuery("zl", zl))
+				.filter(QueryBuilders.matchPhraseQuery("qx", xzqh));
 
 		SearchResponse ketiResponse = ketiSearchRB.setQuery(ketiBoolQueryQueryBuilder1).execute().actionGet();
 
