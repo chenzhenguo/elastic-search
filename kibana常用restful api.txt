@@ -2,6 +2,7 @@ GET _cat/indices
 
 GET /_nodes
 
+
 GET  /_cat/shards
 GET _cat/indices
 
@@ -33,6 +34,16 @@ PUT /_snapshot/my_backup/snapshot_1?wait_for_completion=true
 
 DELETE /_snapshot/my_backup1
 
+
+DELETE tohdfs
+POST /tohdfs/_close
+
+POST _snapshot/my_backup1/snapshot_1/_restore
+{
+   "indices": "tohdfs"
+}
+
+GET /tohdfs/_search
 
 PUT /qlr10yi1_0/_settings
 {
