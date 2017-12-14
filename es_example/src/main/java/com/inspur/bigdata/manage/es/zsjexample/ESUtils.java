@@ -77,6 +77,10 @@ public class ESUtils {
 
 		return client;
 	}
+	
+	
+	
+	
 
 	/**
 	 * 索引列表

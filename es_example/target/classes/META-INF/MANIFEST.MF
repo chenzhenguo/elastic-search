@@ -30,7 +30,8 @@ Class-Path: lib/shield-2.4.6.jar lib/x-pack-transport-5.5.0.jar lib/x-
  ackson-dataformat-yaml-2.8.6.jar lib/jackson-dataformat-cbor-2.8.6.ja
  r lib/t-digest-3.0.jar lib/HdrHistogram-2.1.9.jar lib/jna-4.4.0-1.jar
   lib/slf4j-api-1.7.21.jar lib/fastjson-1.2.38.jar lib/commons-lang3-3
- .0.jar
+ .0.jar lib/jackson-mapper-asl-1.9.13.jar lib/jackson-core-asl-1.9.13.
+ jar lib/jackson-jaxrs-1.9.13.jar
 Build-Jdk: 1.8.0_141
 Created-By: Maven Integration for Eclipse
 Main-Class: com.inspur.bigdata.manage.es.zsjexample.Testpageketi
