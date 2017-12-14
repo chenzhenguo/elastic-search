@@ -47,7 +47,8 @@ public class ESUtils {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		// createIndex(getClient("es", "10.110.13.176"), "ql3", "ql3", 5, 3);
-		writeDocument(getClient("es", "10.110.18.130"), "study", "study");
+		writeDocument(getClient(), "testjson", "testjson");
+		// writeDocument
 	}
 
 	public static void createIndex(TransportClient client, String indexName, String type, int shareds, int replices)
@@ -66,10 +67,14 @@ public class ESUtils {
 
 	}
 
-	public static TransportClient getClient(String clustername, String hostname) throws UnknownHostException {
-		Settings settings = Settings.builder().put("cluster.name", clustername).build();
+	public static TransportClient getClient() throws UnknownHostException {
+		Settings settings = Settings.builder().put("cluster.name", "es").put("transport.type", "netty4")
+				.put("http.type", "netty4").build();
 		TransportClient client = new PreBuiltTransportClient(settings);
-		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(hostname), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.7"), 9300));
+		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.8"), 9300));
+
 		return client;
 	}
 
@@ -143,20 +148,38 @@ public class ESUtils {
 	public static void writeDocument(TransportClient client, String indexName, String typeName) throws IOException {
 
 		Map<String, String> parm = new HashMap<String, String>(1);
-		parm.put("first", "wang");
-		parm.put("last", "jie");
-		Student a = new Student(UUID.randomUUID().toString(), "02", parm);
+		parm.put("DJH", "F-09-41");
+		parm.put("DJB_ID", "6DA37DD3139AA4D9AA55B8D237EC5D4A");
+		parm.put("BDCDYH_NEW", "510504001004GB00080W00000000");
 
-		//Student b = new Student(UUID.randomUUID().toString(), "02", parm);
+		parm.put("GXSJ", "2015-11-28  20:04:28");
+		parm.put("YSDM", "6001010000");
+		parm.put("ZDMJ", "973.5");
 
-		List<Student> students = Arrays.asList(a);
-		String jsondata=JSON.toJSONString(students);
-		jsondata=jsondata.replace("[", "").replace("]", "");
+		parm.put("BDCDYH", "510504001004GB00080W00000000");
+		parm.put("BDCDYH_OLD", "510504001004GB00080W00000000");
+		parm.put("RECORDS", "0");
+		parm.put("ZDDM_NEW", "510504001004GB00080W00000000");
 
-		IndexResponse response = client.prepareIndex(indexName, typeName).setId("1")
-				.setSource(jsondata, XContentType.JSON).get();
+		parm.put("ZL", "ZL623179");
+		parm.put("QXDM", "510504");
+		parm.put("TFH", "TFH9331");
+		parm.put("SCRKSJ", "2015-11-28 20:04:28");
+		parm.put("ZDDM", "510504001004GB00080");
+		parm.put("ID", "6DA37DD3139AA4D9AA55B8D237EC5D4A");
+		parm.put("BSM", "331");
+		parm.put("ZDDM_OLD", "510504001004GB00080");
 
-		System.out.println("写入成功" + ";fragment:" + response.isFragment());
+		String jsondata = JSON.toJSONString(parm);
+		jsondata = jsondata.replace("[", "").replace("]", "");
+
+		System.out.println(jsondata);
+
+		 IndexResponse response = client.prepareIndex(indexName,
+		 typeName).setId("1")
+		 .setSource(jsondata, XContentType.JSON).get();
+		
+		 System.out.println("写入成功" + ";fragment:" + response.isFragment());
 	}
 
 	/**
