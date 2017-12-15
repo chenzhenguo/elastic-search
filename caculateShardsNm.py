@@ -1,20 +1,13 @@
 
-
-
-recordsPerGMap=dict(oneGQlrRecords=808482,oneGQlRecords=808480,oneGKetiRecords=1342729)
-def getShardNum(machineNm,totalData,replies=1,bestNmPerShard=30,indexType='qlr'):
+def getShardNum(totalData,replies=1,bestNmPerShard=30):
    capacity=0
-
-   if 'qlr' in indexType:
-       recordsPerG=recordsPerGMap['oneGQlrRecords']
-   elif 'ql' in indexType:
-       recordsPerG=recordsPerGMap['oneGQlRecords']
-   else:
-       recordsPerG=recordsPerGMap['oneGKetiRecords']
-
+   recordsPerG=10000
    capacity=divmod(totalData,recordsPerG)[0]
+   print capacity
    replies+=1
-   shardNum=divmod(capacity,(replies*bestNmPerShard))[0]
+   shardNum=replies*divmod(capacity,bestNmPerShard)[0]
+
+   print divmod(capacity,(replies*bestNmPerShard))
    return shardNum
 
 
@@ -22,6 +15,6 @@ def getShardNum(machineNm,totalData,replies=1,bestNmPerShard=30,indexType='qlr')
 if  __name__=='__main__':
     print 'how many machine ,how mangy records ,and which index you will use'
     print ''' you can choose from [keti,qlr,ql]  '''
-    print 'you need %d shards' % getShardNum(6,1000000000,indexType='keti')
+    print 'you need %d shards' % getShardNum(3000000)
 
 
