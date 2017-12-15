@@ -55,11 +55,30 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * 
  * all operation has two styles
  * 
- * one way oby restfull strictly,use index(update\delete)Request,and client call
+ * The Java High Level REST,one way oby restfull strictly,use index(update\delete)Request,and client call
  * index(update\delete)method to exec request,just like httclient to exec
- * HttpGet,HttpPost,HttpDelete.
+ * HttpGet,HttpPost,HttpDelete.such is elasticsearch tell us ,as blow: The Java
+ * High Level REST Client works on top of the Java Low Level REST client. Its
+ * main goal is to expose API specific methods, that accept request objects as
+ * an argument and return response objects, so that request marshalling and
+ * response un-marshalling is handled by the client itself.
  * 
- * another way oby restfull not strictly,use less code like this,
+ * Each API can be called synchronously or asynchronously. The synchronous
+ * methods return a response object, while the asynchronous methods, whose names
+ * end with the async suffix, require a listener argument that is notified (on
+ * the thread pool managed by the low level client) once a response or an error
+ * is received.
+ * 
+ * The Java High Level REST Client depends on the Elasticsearch core project. It
+ * accepts the same request arguments as the TransportClient and returns the
+ * same response objects.
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * Another way oby restfull not strictly,use less code like this,
  * client.prepareIndex...(prepareUpdate,prepareDeleter) and return response
  * 
  * 
@@ -358,7 +377,8 @@ public class ESUtils {
 	/**
 	 * delete by query
 	 * 
-	 * @throws UnknownHostException*/
+	 * @throws UnknownHostException
+	 */
 	public static void deleteDocumentByQuery(TransportClient client, String indexName) throws UnknownHostException {
 		BulkByScrollResponse response = DeleteByQueryAction.INSTANCE.newRequestBuilder(client)
 				.filter(QueryBuilders.termQuery("postDate", "xiugaihou")).source(indexName).get();
