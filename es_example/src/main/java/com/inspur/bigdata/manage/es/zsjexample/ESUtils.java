@@ -18,8 +18,11 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRespon
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
@@ -47,10 +50,24 @@ public class ESUtils {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		// createIndex(getClient("es", "10.110.13.176"), "ql3", "ql3", 5, 3);
-		writeDocument(getClient(), "testjson", "testjson");
+		// writeDocumentByPrepareIndex(getClient(), "tohdfs", "tohdfs");
+
+		// writeDocumentByIndexRequest(getClient(), "tohdfs", "tohdfs");
+
+		UpdateDocumentByPrepareUpdate(getClient(), "tohdfs", "tohdfs");
 		// writeDocument
 	}
 
+	/****
+	 * create index
+	 * 
+	 * @param client
+	 * @param indexName
+	 * @param type
+	 * @param shareds
+	 * @param replices
+	 * @throws IOException
+	 */
 	public static void createIndex(TransportClient client, String indexName, String type, int shareds, int replices)
 			throws IOException {
 		XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject("settings")
@@ -77,10 +94,6 @@ public class ESUtils {
 
 		return client;
 	}
-	
-	
-	
-	
 
 	/**
 	 * 索引列表
@@ -97,7 +110,7 @@ public class ESUtils {
 	}
 
 	/**
-	 * 创建索引
+	 * create index with default setting
 	 * 
 	 * @throws UnknownHostException
 	 */
@@ -112,7 +125,7 @@ public class ESUtils {
 	}
 
 	/**
-	 * 判断索引是否存在
+	 * if exist index
 	 * 
 	 * @throws UnknownHostException
 	 */
@@ -145,45 +158,114 @@ public class ESUtils {
 	}
 
 	/**
-	 * 写入数据
+	 * write to index with PrepareIndex
+	 * 
+	 * way 1
 	 * 
 	 * @throws IOException
 	 */
-	public static void writeDocument(TransportClient client, String indexName, String typeName) throws IOException {
+	public static void writeDocumentByPrepareIndex(TransportClient client, String indexName, String typeName)
+			throws IOException {
 
 		Map<String, String> parm = new HashMap<String, String>(1);
-		parm.put("DJH", "F-09-41");
-		parm.put("DJB_ID", "6DA37DD3139AA4D9AA55B8D237EC5D4A");
-		parm.put("BDCDYH_NEW", "510504001004GB00080W00000000");
 
-		parm.put("GXSJ", "2015-11-28  20:04:28");
-		parm.put("YSDM", "6001010000");
-		parm.put("ZDMJ", "973.5");
-
-		parm.put("BDCDYH", "510504001004GB00080W00000000");
-		parm.put("BDCDYH_OLD", "510504001004GB00080W00000000");
-		parm.put("RECORDS", "0");
-		parm.put("ZDDM_NEW", "510504001004GB00080W00000000");
-
-		parm.put("ZL", "ZL623179");
-		parm.put("QXDM", "510504");
-		parm.put("TFH", "TFH9331");
-		parm.put("SCRKSJ", "2015-11-28 20:04:28");
-		parm.put("ZDDM", "510504001004GB00080");
-		parm.put("ID", "6DA37DD3139AA4D9AA55B8D237EC5D4A");
-		parm.put("BSM", "331");
-		parm.put("ZDDM_OLD", "510504001004GB00080");
+		parm.put("BDCDYH", "510504001004GB00080W00000012");
 
 		String jsondata = JSON.toJSONString(parm);
 		jsondata = jsondata.replace("[", "").replace("]", "");
 
 		System.out.println(jsondata);
 
-		 IndexResponse response = client.prepareIndex(indexName,
-		 typeName).setId("1")
-		 .setSource(jsondata, XContentType.JSON).get();
-		
-		 System.out.println("写入成功" + ";fragment:" + response.isFragment());
+		IndexResponse response = client.prepareIndex(indexName, typeName).setId("3")
+				.setSource(jsondata, XContentType.JSON).get();
+
+		while (response.isFragment()) {
+			System.out.println("写入成功");
+		}
+
+	}
+
+	/**
+	 * write to index with IndexRequest
+	 * 
+	 * way 2
+	 * 
+	 * @throws IOException
+	 */
+	public static void writeDocumentByIndexRequest(TransportClient client, String indexName, String typeName)
+			throws IOException {
+
+		Map<String, String> parm = new HashMap<String, String>(1);
+
+		parm.put("BDCDYH", "510504001004GB00080W00000000");
+
+		// String jsondata = JSON.toJSONString(parm);
+
+		System.out.println(parm);
+
+		IndexResponse response = client.index(new IndexRequest(indexName, typeName, "2").source(parm)).actionGet();
+
+		/*
+		 * by way one
+		 * 
+		 * IndexResponse response1 = client.prepareIndex(indexName,
+		 * typeName).setId("2") .setSource(parm, XContentType.JSON).get();
+		 */
+
+		while (response.isFragment()) {
+			System.out.println("写入成功");
+		}
+
+	}
+
+	/***
+	 * update index by updateRequest
+	 * 
+	 * @param client
+	 * @param indexName
+	 * @param typeName
+	 * @throws IOException
+	 */
+	public static void UpdateDocumentByUpdateRequest(TransportClient client, String indexName, String typeName)
+			throws IOException {
+
+		Map<String, String> parm = new HashMap<String, String>(1);
+
+		parm.put("BDCDYH", "121212121");
+
+		// String jsondata = JSON.toJSONString(parm);
+
+		System.out.println(parm);
+
+		UpdateResponse response = client.update(new UpdateRequest(indexName, typeName, "0").doc(parm)).actionGet();
+
+		System.out.println("修改成功,分片信息" + response.getShardInfo().toString());
+
+	}
+
+	/***
+	 * update index by updateRequest
+	 * 
+	 * @param client
+	 * @param indexName
+	 * @param typeName
+	 * @throws IOException
+	 */
+	public static void UpdateDocumentByPrepareUpdate(TransportClient client, String indexName, String typeName)
+			throws IOException {
+
+		Map<String, String> parm = new HashMap<String, String>(1);
+
+		parm.put("BDCDYH", "123");
+
+		// String jsondata = JSON.toJSONString(parm);
+
+		System.out.println(parm);
+
+		UpdateResponse response = client.prepareUpdate(indexName, typeName, "0").setDoc(parm, XContentType.JSON).get();
+
+		System.out.println("修改成功,分片信息" + response.getShardInfo().toString());
+
 	}
 
 	/**
@@ -214,41 +296,4 @@ public class ESUtils {
 			throws UnknownHostException {
 		DeleteResponse response = client.prepareDelete(indexName, typeName, documentID).get();
 	}
-}
-
-class Student {
-	private String bdcdyh;
-	private String lx;
-	private Map<String, String> name;
-
-	Student(String bdcdyh, String lx, Map<String, String> name) {
-		this.bdcdyh = bdcdyh;
-		this.lx = lx;
-		this.name = name;
-	}
-
-	public String getBdcdyh() {
-		return bdcdyh;
-	}
-
-	public void setBdcdyh(String bdcdyh) {
-		this.bdcdyh = bdcdyh;
-	}
-
-	public String getLx() {
-		return lx;
-	}
-
-	public void setLx(String lx) {
-		this.lx = lx;
-	}
-
-	public Map<String, String> getName() {
-		return name;
-	}
-
-	public void setName(Map<String, String> name) {
-		this.name = name;
-	}
-
 }

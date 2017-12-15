@@ -15,6 +15,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
@@ -112,7 +113,9 @@ public class TestBulkRequestBuilder {
 	        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
 	        BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
 	
-	        
+		// IndexRequest re=new IndexRequest("a", "b");
+		// re.source(source);
+		// client.index(re).get();
 	        /*
 	         * write
 	        
@@ -143,7 +146,6 @@ public class TestBulkRequestBuilder {
 	            bulkRequestBuilder.add(client.prepareUpdate("tohdfs", "tohdfs",String.valueOf(0)).setDocAsUpsert(true).setDoc(json));
 	        }
 
-
 	        if (bulkRequestBuilder.numberOfActions() > 0) {
 	            BulkResponse bulkItemResponse = bulkRequestBuilder.execute().actionGet();
 	            if (bulkItemResponse.hasFailures()) {
@@ -151,6 +153,7 @@ public class TestBulkRequestBuilder {
 	            }
 	        }
 
+	        
 
 	        client.close();
 	        
