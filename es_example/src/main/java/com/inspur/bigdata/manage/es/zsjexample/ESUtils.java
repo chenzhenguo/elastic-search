@@ -249,7 +249,6 @@ public class ESUtils {
 
 		parm.put("BDCDYH", "510504001004GB00080W00000000");
 
-		// String jsondata = JSON.toJSONString(parm);
 
 		System.out.println(parm);
 
