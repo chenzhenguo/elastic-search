@@ -28,12 +28,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 class EsConfig {
-	public static final String KETI_INDEX = "keti10_5";
-	public static final String KETI_TYPE = "keti10_5";
-	public static final String QUANLI_INDEX = "ql10_5";
-	public static final String QUANLI_TYPE = "ql10_5";
-	public static final String QUANLIREN_INDEX = "qlr10_5";
-	public static final String QUANLIREN_TYPE = "qlr10_5";
+	public static final String KETI_INDEX = "keti10_10";
+	public static final String KETI_TYPE = "keti10_10";
+	public static final String QUANLI_INDEX = "ql20_10";
+	public static final String QUANLI_TYPE = "ql20_10";
+	public static final String QUANLIREN_INDEX = "qlr20_10";
+	public static final String QUANLIREN_TYPE = "qlr20_10";
 	/***
 	 * 虚拟机：0 实体机：1
 	 */
@@ -71,7 +71,7 @@ class ProcessHandler implements Runnable {
 
 				// wn.addKetiCount();
 				// 一个客体有几个权利人，每个权利人暂定一个权利
-				int qlrcount = BaseUtil.getScopeInt(1, 3);
+				int qlrcount =2;
 				for (int a = 0; a < qlrcount; a++) {
 					String qluuid = BaseUtil.getUUid();
 					bulk.add(new IndexRequest(EsConfig.QUANLIREN_INDEX, EsConfig.QUANLIREN_TYPE).source(XContentFactory
@@ -117,7 +117,7 @@ public class WriteToEsMultiThread {
 	// public static String hostname = "10.110.13.174";
 	// public static String hostname = "localhost";
 	public static String clustername = "es";
-	public static double count = 400000000.0;
+	public static double count = 0;
 	public static ObjectMapper mapper = new ObjectMapper();
 
 	public static TransportClient getClient1withNOxpack() throws UnknownHostException {

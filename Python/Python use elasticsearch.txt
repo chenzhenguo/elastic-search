@@ -1,0 +1,4 @@
+1 °²×°PythonÒÀÀµ
+pip install elasticsearch2
+
+2.
