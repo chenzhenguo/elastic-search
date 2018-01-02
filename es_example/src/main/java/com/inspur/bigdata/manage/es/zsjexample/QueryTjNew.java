@@ -38,26 +38,26 @@ public class QueryTjNew {
 	// static String qlTypeName = "ql10yi";
 	// static String qlIndexName="ql10_5";
 	// static String qlTypeName="ql10_5";
-	static String qlIndexName = "ql10_10";
-	static String qlTypeName = "ql10_10";
+	static String qlIndexName = "ql20_10";
+	static String qlTypeName = "ql20_10";
 
 	// static String qlrIndexName = "qlr10yi";
 	// static String qlrTypeName = "qlr10yi";
 	// static String qlrIndexName="qlr10_5";
 	// static String qlrTypeName="qlr10_5";
-	static String qlrIndexName = "qlr10_10";
-	static String qlrTypeName = "qlr10_10";
+	static String qlrIndexName = "qlr20_10";
+	static String qlrTypeName = "qlr20_10";
 
 	public static void main(String[] args) throws UnknownHostException {
 
 		TransportClient client = getClient1withNOxpack();
 
 		// 场景1：按照省统计不动产数量
-		// tiKetiNmByProvinceMul(client);
+		 tiKetiNmByProvinceMul(client);
 		// 场景2：按照权利类型统计权利数量
 		// tjByQllxByMul(client);
 		// 场景3：按照省和权利人类型统计权利人数量（按照权利人类型）
-		tjKetiNumLeixingGroupByProvince(client);
+		//tjKetiNumLeixingGroupByProvince(client);
 		// 场景4：按照省统计不动产证和不动产登记号的数量
 
 	}
