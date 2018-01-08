@@ -17,14 +17,14 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 enum Config {
-//	 INDEX_KETI("keti10yi"), INDEX_QLR("qlr10yi"), INDEX_QL("ql10yi"),
-//	 TYPE_KETI("keti10yi"), TYPE_QLR(
-//	 "qlr10yi"), TYPE_QL("ql10yi");
+	// INDEX_KETI("keti10yi"), INDEX_QLR("qlr10yi"), INDEX_QL("ql10yi"),
+	// TYPE_KETI("keti10yi"), TYPE_QLR(
+	// "qlr10yi"), TYPE_QL("ql10yi");
 
-//	INDEX_KETI("keti10_5"), INDEX_QLR("qlr10_5"), INDEX_QL("ql10_5"), TYPE_KETI("keti10_5"), TYPE_QLR(
-//			"qlr10_5"), TYPE_QL("ql10_5");
-	
-	
+	// INDEX_KETI("keti10_5"), INDEX_QLR("qlr10_5"), INDEX_QL("ql10_5"),
+	// TYPE_KETI("keti10_5"), TYPE_QLR(
+	// "qlr10_5"), TYPE_QL("ql10_5");
+
 	INDEX_KETI("keti10_10"), INDEX_QLR("qlr20_10"), INDEX_QL("ql20_10"), TYPE_KETI("keti10_10"), TYPE_QLR(
 			"qlr20_10"), TYPE_QL("ql20_10");
 	private String content;
@@ -51,15 +51,15 @@ public class QueryKeti {
 
 		TransportClient client = getClient1withNOxpack();
 		// 查询场景：查询出客体前100条记录，无条件，根据每条客体记录的不动产单元号，获取权利人 毫秒
-//		 getQyrsBYNone(client);
+		// getQyrsBYNone(client);
 
 		// 查询场景：查询出客体前100条记录，条件：不动产单元号(坐落)，根据每条客体记录的不动产单元号获取权利人 毫秒
-		 //getQyrsByBdcdyhOrZl(client, "zl","青岛");
-//		 getQyrsByBdcdyhOrZl(client, "bdcdyh",
-//		 "510402037988GB60680F748486014");
+		// getQyrsByBdcdyhOrZl(client, "zl","青岛");
+		// getQyrsByBdcdyhOrZl(client, "bdcdyh",
+		// "510402037988GB60680F748486014");
 
 		// 查询出客体前100条记录，条件：坐落+行政区划，根据每条客体记录的不动产单元号，获取权利人 毫秒
-		//getQlrByZlXzqh(client, "昆明", "530122");
+		// getQlrByZlXzqh(client, "昆明", "530122");
 		client.close();
 
 	}
@@ -83,7 +83,6 @@ public class QueryKeti {
 		// InetSocketTransportAddress(InetAddress.getByName("10.110.18.132"),
 		// 9300));
 
-		
 		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.6"), 9300));
 		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.7"), 9300));
 		client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.6.8"), 9300));
@@ -164,13 +163,11 @@ public class QueryKeti {
 		SearchRequestBuilder ketiSearchRB = client.prepareSearch(Config.INDEX_KETI.getContent())
 				.setTypes(Config.TYPE_KETI.getContent()).setSize(100);
 
-		
 		// SearchResponse response =
 		// client.prepareSearch(index).setTypes(type).setSize(size).execute().actionGet();
 
 		BoolQueryBuilder ketiBoolQueryQueryBuilder1 = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("records", 0)).must(QueryBuilders.termsQuery(key, paramV));
-		
 
 		SearchResponse ketiResponse = ketiSearchRB.setQuery(ketiBoolQueryQueryBuilder1).execute().actionGet();
 

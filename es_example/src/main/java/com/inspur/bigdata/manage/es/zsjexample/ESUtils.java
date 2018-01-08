@@ -23,6 +23,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
@@ -44,6 +45,11 @@ import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filters.Filters;
+import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import com.alibaba.fastjson.JSON;
@@ -472,6 +478,35 @@ public class ESUtils {
 		// new UpdateRequest(index, type, "001").doc(parm);
 		// bulkProcessor.add(UpdateRequest);
 
+	}
+
+	/****
+	 * 结构化的统计
+	 * 
+	 * @param client
+	 * @param indexname
+	 * @param typename
+	 * @param zjh
+	 */
+	public static void testStructingAggregation(TransportClient client, String indexname, String typename, String zjh) {
+
+		AggregationBuilder structedAggregationBuilder = AggregationBuilders.terms("by_country").field("country")
+				.subAggregation(AggregationBuilders.dateHistogram("by_year").field("dateOfBirth")
+						.dateHistogramInterval(DateHistogramInterval.YEAR)
+						.subAggregation(AggregationBuilders.avg("avg_children").field("children")));
+
+		SearchRequestBuilder srb = client.prepareSearch(indexname).setTypes(typename).setSize(100);
+		srb.addAggregation(structedAggregationBuilder);
+
+		SearchResponse sr = srb.execute().actionGet();
+
+		Filters agg = sr.getAggregations().get("qlrtj");
+
+		for (Filters.Bucket entry : agg.getBuckets()) {
+			String key = entry.getKeyAsString();
+			long docCount = entry.getDocCount();
+			System.out.println("zjh" + key + ",count:" + docCount);
+		}
 	}
 
 }
