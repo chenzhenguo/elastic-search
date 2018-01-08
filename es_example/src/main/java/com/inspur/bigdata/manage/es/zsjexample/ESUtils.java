@@ -33,6 +33,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
@@ -40,6 +41,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
@@ -50,6 +52,15 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filters.Filters;
 import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregator;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.max.Max;
+import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.min.Min;
+import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.stats.Stats;
+import org.elasticsearch.search.aggregations.metrics.stats.StatsAggregationBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import com.alibaba.fastjson.JSON;
@@ -508,5 +519,143 @@ public class ESUtils {
 			System.out.println("zjh" + key + ",count:" + docCount);
 		}
 	}
+	
+	/**
+	 * 测试组合聚合
+	 * @param client
+	 * @param indexname
+	 * @param typename
+	 */
+	public static void testSubAgg(TransportClient client, String indexname, String typename) {
+
+		SearchRequestBuilder srb = client.prepareSearch(indexname).setTypes(typename).setSize(100);
+		srb.addAggregation(AggregationBuilders.terms("byCountry").field("country")
+				.subAggregation(AggregationBuilders.max("maxage").field("age")));
+
+		SearchResponse sr = srb.execute().actionGet();
+
+		Terms agg = sr.getAggregations().get("byCountry");
+		for (Terms.Bucket entry : agg.getBuckets()) {
+			String key = (String) entry.getKey(); // bucket key
+			long docCount = entry.getDocCount(); // Doc count
+			System.out.println("key " + key + " doc_count " + docCount);
+			
+			Max agg1 = entry.getAggregations().get("maxage");
+			double value1 = agg1.getValue();
+			System.out.println("minage:"+value1);
+		}
+
+	}
+
+	/****
+	 * 结构化的统计
+	 * 
+	 * @param client
+	 * @param indexname
+	 * @param typename
+	 * @param zjh
+	 */
+	public static void testMetricsAgg(TransportClient client, String indexname, String typename) {
+
+		MinAggregationBuilder aggregation1 = AggregationBuilders.min("minage").field("age");
+
+		MaxAggregationBuilder aggregation2 = AggregationBuilders.max("maxAge").field("age");
+
+		StatsAggregationBuilder aggregation3 = AggregationBuilders.stats("allAboutAge").field("age");
+
+		SearchRequestBuilder srb = client.prepareSearch(indexname).setTypes(typename).setSize(100);
+		srb.addAggregation(aggregation1);
+		srb.addAggregation(aggregation2);
+		srb.addAggregation(aggregation3);
+
+		SearchResponse sr = srb.execute().actionGet();
+
+		Min agg1 = sr.getAggregations().get("minage");
+		double value1 = agg1.getValue();
+
+		Max agg2 = sr.getAggregations().get("maxAge");
+		double value2 = agg2.getValue();
+		System.out.println("min :" + value1 + "max :" + value2);
+
+		Stats agg = sr.getAggregations().get("allAboutAge");
+		double min = agg.getMin();
+		double max = agg.getMax();
+		double avg = agg.getAvg();
+		double sum = agg.getSum();
+		double count = agg.getCount();
+
+		System.out.println(String.format("all status is :[min]:%f,[max]:%f,[avg]:%f,[sum]:%f,[count]:%f", min, max, avg,
+				sum, count));
+
+	}
+
+	/****
+	 * 测试 桶 统计
+	 * 
+	 * @param client
+	 * @param indexname
+	 * @param typename
+	 */
+	public static void testBucketAgg(TransportClient client, String indexname, String typename) {
+		AggregationBuilder aggregation = AggregationBuilders.filters("agg",
+				new FiltersAggregator.KeyedFilter("age28", QueryBuilders.termQuery("age", 28)));
+
+		SearchRequestBuilder srb = client.prepareSearch(indexname).setTypes(typename).setSize(100);
+
+		srb.addAggregation(aggregation);
+
+		SearchResponse sr = srb.execute().actionGet();
+
+		Filters agg = sr.getAggregations().get("agg");
+
+		for (Filters.Bucket entry : agg.getBuckets()) {
+			String key = entry.getKeyAsString(); // bucket key
+			long docCount = entry.getDocCount(); // Doc count
+			System.out.println("key [{" + key + "}], doc_count [{" + docCount + "}]");
+		}
+
+	}
+
+	/***
+	 * 查询结果带高亮
+	 * 
+	 * @param client
+	 */
+	public static void queryWithHighLight(TransportClient client, String indexName, String typeName) {
+
+		BoolQueryBuilder boolQ = QueryBuilders.boolQuery().filter(QueryBuilders.matchPhraseQuery("full_name", "wj"));
+		SearchRequestBuilder srb = client.prepareSearch(indexName).setTypes(typeName).setSize(100);
+
+		HighlightBuilder highlightBuilder = new HighlightBuilder().field("email").requireFieldMatch(false);
+		highlightBuilder.preTags("<span style=\"color:red\">");
+		highlightBuilder.postTags("</span>");
+		srb.highlighter(highlightBuilder);
+
+		SearchResponse response = srb.setQuery(boolQ).execute().actionGet();
+
+		SearchHits result = response.getHits();
+		long num = result.getTotalHits();
+
+		SearchHit[] resultHit = result.getHits();
+		for (int i = 0; i < num; i++) {
+			System.out.println("总的显示：");
+			System.out.println(resultHit[i].getSource().toString());
+
+			System.out.println("处理高亮部分...");
+			Map<String, HighlightField> highlightFields = resultHit[i].getHighlightFields();
+			// 注意这里email在索引映射中必须stored 为true
+			HighlightField titleField = highlightFields.get("email");
+
+			Text[] fragments = titleField.fragments();
+			StringBuilder builder = new StringBuilder();
+			for (Text item : fragments) {
+				builder.append(item.toString());
+			}
+			System.out.println("高亮部分：" + builder.toString());
+
+		}
+
+	}
+
 
 }
