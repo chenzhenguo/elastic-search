@@ -1,75 +1,9 @@
 GET _cat/indices
 
-DELETE hg
-
-GET hg1/_count
-
-GET  hg1/_mapping
-
-GET hg/_mapping
-
-GET hg/_search
-
 GET /_nodes
 
-PUT /_cluster/settings
-{
-    "persistent" : {
-        "indices.store.throttle.max_bytes_per_sec" : "100mb"
-    }
-}
 
-
-POST  qlrv1/_open
-GET  qlrv1/_search
-{
-  "query": {         
-    "prefix": {
-      "QXDM": "3702"
-    }
-  },
-  "aggs": {
-    "aggbyLx": {
-      "terms": {
-        "field": "LX"
-      }
-    }
-  }
-}
-
-POST /qlrv1/_cache/clear
-
-GET qlrv1/_mapping
-
-GET /_cat/shards/qlrv3
-
-GET qlrv4/_settings
-
-GET people/_search
-
-GET  qlr1/_settings
-
-GET qlr/_count  
-
-GET qlrv16/_search
-{
-  "size": 1000
-}
-
-
-
-PUT /qlr/_settings
-{
-  "index":{"refresh_interval":"6s"}
-}
-
-GET qlr/_mapping
-
-
-GET people/_mapping
-
-GET  /_cat/shards/qlr1
-
+GET  /_cat/shards
 GET _cat/indices
 
 GET /keti/_count
@@ -282,45 +216,7 @@ PUT tohdfs/study1/3
   "age":29
 }
 
-DELETE  tohdfs
-
-PUT /tohdfs/_optimize?max_num_segments=3
-
 GET tohdfs/_search
-
-DELETE  tohdfs
-
-
-GET tohdfs/study1/_search
-{
-    "query" : {
-        "match": { "age": 27 }
-    },
-    "highlight" : {
-        "require_field_match": false,
-        "fields": {
-                "_all" : { "pre_tags" : ["<em>"], "post_tags" : ["</em>"] }
-        }
-    }
-}
-
-GET tohdfs/study1/_search
-{
-    "query" : {
-        "term": { "age": 27 }
-    },
-    "highlight" : {
-        "fields" : {
-            "name" : {"type" : "unified"}
-        }
-    }
-}
-PUT tohdfs/study1/1
-{
-  "lx":1,
-  "name":"王杰",
-  "age":27
-}
 
 PUT tohdfs
 {
@@ -334,14 +230,14 @@ PUT tohdfs
     "study1": {
         "properties": {
           "name":{
-            "type":"text",
-            "store": true, 
-            "index_options": "offsets"
+            "type":"keyword"
+          },
+          "bdcdyh": {
+            "type": "keyword"
           },
           "lx": {
-            "type": "keyword",
-            "store": true
-          },
+            "type": "keyword"
+            },
           "age":{
               "type":"integer"
             }
@@ -446,13 +342,13 @@ GET keti_1y/_mapping
 GET _analyze
 {
   "analyzer":"ik_max_word",
-  "text":"广西省壮族自治柳州鹿寨县"
+  "text":"西藏自治区日喀则市岗巴县"
 }
 
 GET _analyze/
 {
   "analyzer":"ik_smart",
-  "text":"广西省壮族自治柳州鹿寨县"
+  "text":"广西省壮族自治柳州市鹿寨县"
 }
 
 GET keti10yi/_mapping
