@@ -1,42 +1,5 @@
 GET _cat/indices
 
-
-
-GET  qlrv1/_search
-{
-  "size": 1, 
-  "query": {         
-    "term": {
-      "RECORDS": 0
-    }
-  },
-  "aggs": {
-    "aggbyLx": {
-      "terms": {
-        "field": "LX",
-        "size": 100
-      }
-    }
-  }
-}
-
-
-
-
-PUT qlrv1/qlr/100013
-{
-   "BDCDYH": "610303230224GB79507F206959827",
-    "ZJH": "140525199306253956",
-    "ID": "0fd9f93331404a4f9ca481fb48034b26",
-    "QLID": "6ddcac8840904e48acbc9a0e3efabc80",
-    "QXDM": "610303",
-    "LX": "14",
-    "QLRMC": "ËÎ×¨¼Ò  ",
-     "DW": "±¤Â¿Ð´ÇÜµØ¼§ÍÏ·ÀµÄÆë±åÑ´",
-    "RECORDS": 0,
-    "SCRKSJ": "2018-01-11 19:14:16"
-}
-
 DELETE hg
 
 GET hg1/_count
@@ -848,8 +811,6 @@ PUT /pageindex/_settings
       }
       }
 }
-
-
 
 
 GET /keti1/keti1/_count
