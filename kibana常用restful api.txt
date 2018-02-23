@@ -20,6 +20,129 @@ PUT /_cluster/settings
 }
 
 
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+
+GET /ad/ad/_search
+{
+  "aggs": {
+    "lx_agg": {
+      "range": {
+        "field": "lx",
+        "ranges": [
+          {
+            "from": 0,
+            "to": 2
+          }
+        ]
+      }
+    }
+  }
+}
+
+GET /ad/ad/_search
+{
+  "aggs": {
+    "NAME": {
+        "filter":{"term": {
+          "picpath": "flower2"
+        }},
+        "aggs": {
+          "agg_by_lx": {
+            "value_count": {
+              "field": "lx"
+            }
+          }
+        }
+        
+      
+    }
+  }
+}
+
+
+GET /ad/ad/_search
+{
+  "aggs": {
+    "NAME": {
+        "filter":{"term": {
+          "picpath": "flower2"
+        }},
+        "aggs": {
+          "agg_by_lx": {
+            "max": {
+              "field": "lx"
+            }
+          }
+        }
+    }
+  }
+}
+
+
+PUT ad/ad/13
+{
+  "id":"00013",
+  "adname":"softdesign13",
+  "picpath":"flower3",
+  "lx":1,
+  "user":{
+    "id":1,"name":"wj"
+  },
+  "searchtimes":10
+}
+DELETE ad/ad/10
+
+
+
+
+GET /ad/_count
+
+PUT ad
+{
+  
+  "settings" : {
+        "number_of_shards":3,
+        "number_of_replicas" : 1,
+        "refresh_interval":"30s"
+     },
+  "mappings": 
+  {
+    "ad": {
+        "properties": {
+          "id":{
+            "type":"keyword"
+          },
+          "adname":{
+            "type":"text",
+            "store": true
+          },
+          "picpath":{
+            "type": "keyword"
+          },
+          "lx":{
+              "type":"integer"
+            },
+          "searchtimes":{
+            "type": "integer"
+          },
+          "user":{
+             "type": "nested"
+           }
+          }
+      }
+  }
+}
+
+
+
+
+
 
 
 PUT  user/user/2
